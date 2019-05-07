@@ -5,16 +5,16 @@ import re
 import codecs
 import sys
 
-gene=sys.argv[1]
+#gene=sys.argv[1]
 
 ## turn dictionary (synonyms) to regular expression
 def undic(dic):
-    return "|".join(dic.keys())+"|"+"|".join(dic.values())
+    return "|".join(dic.values())
 
 def findWholeWord(w):
     return re.compile(r'\b({0})\b'.format(w), flags=re.IGNORECASE).search
 
-def getSentences(query):
+def getSentences(query, gene):
     abstracts = os.popen("esearch -db pubmed -query " +  query + " | efetch -format uid |fetch-pubmed -path /run/media/hao/PubMed/Archive/ | xtract -pattern PubmedArticle -element MedlineCitation/PMID,ArticleTitle,AbstractText").read()
     out=str()
     for row in abstracts.split("\n"):
@@ -26,18 +26,18 @@ def getSentences(query):
         for sent in sentences:
             if findWholeWord(gene)(sent):
                 sent=re.sub(r'\b(%s)\b' % gene, r'<b>\1</b>', sent, flags=re.I)
-                out+=pmid+"\t"+sent+"\n"
+                out+=pmid+"\t"+sent+"<br>\n"
     return(out)
 
 def gene_addiction(gene):
     # search gene name & drug name  in the context of addiction terms (i.e., exclude etoh affects cancer, or methods to extract cocaine) 
-    q="\"(" + addiction.replace("|", " OR ")  + ") AND (" + drugs.replace("|", " OR ", ) + ") AND " + gene + "\""
-    sents=getSentences(q)
+    q="\"(" + addiction.replace("|", " OR ")  + ") AND (" + drug.replace("|", " OR ", ) + ") AND " + gene + "\""
+    sents=getSentences(q, gene)
     out=str()
     for sent in sents.split("\n"):
-        for drug0 in drugs_d:
-            if findWholeWord(drugs_d[drug0])(sent) :
-                sent=re.sub(r'\b(%s)\b' % drugs_d[drug0], r'<b>\1</b>', sent, flags=re.I)
+        for drug0 in drug_d:
+            if findWholeWord(drug_d[drug0])(sent) :
+                sent=re.sub(r'\b(%s)\b' % drug_d[drug0], r'<b>\1</b>', sent, flags=re.I)
                 out+=gene+"\t"+"drug\t" + drug0+"\t"+sent+"\n"
         for add0 in addiction.split("|"):
             if findWholeWord(add0)(sent) :
@@ -47,7 +47,7 @@ def gene_addiction(gene):
 
 def gene_anatomical(gene):
     q="\"(" + brain.replace("|", " OR ")  + ") AND " + gene + "\""
-    sents=getSentences(q)
+    sents=getSentences(q,gene)
     out=str()
     for sent in sents.split("\n"):
         for brain0 in brain_d:
@@ -56,27 +56,50 @@ def gene_anatomical(gene):
                 out+=gene+"\t"+"brain\t"+brain0+"\t"+sent+"\n"
     return(out)
 
-def gene_biological(gene):
-    q="\"(" + biological.replace("|", " OR ")  + ") AND " + gene + "\""
-    sents=getSentences(q)
+def gene_functional(gene):
+    q="\"(" + function.replace("|", " OR ")  + ") AND " + gene + "\""
+    sents=getSentences(q,gene)
     out=str()
     for sent in sents.split("\n"):
-        for bio0 in biological_d:
-            if findWholeWord(biological_d[bio0])(sent) :
-                sent=re.sub(r'\b(%s)\b' % biological_d[bio0], r'<b>\1</b>', sent, flags=re.I)
+        for bio0 in function_d:
+            if findWholeWord(function_d[bio0])(sent) :
+                sent=re.sub(r'\b(%s)\b' % function_d[bio0], r'<b>\1</b>', sent, flags=re.I)
                 out+=gene+"\t"+"function\t"+bio0+"\t"+sent+"\n"
     return(out)
 
-addiction="reward|reinforcement|sensitization|intake|addiction|drug abuse|relapse|self-administered|self-administration|reinstatement|binge|intoxication|withdrawal|conditioned place preference|aversion|aversive|CPP"
+def generate_nodes(nodes_d):
+    # include all search terms even if there are no edges, just to show negative result 
+    json0 =str() #"{ data: { id: '" + gene +  "'} },\n"
+    for node in nodes_d:
+        json0 += "{ data: { id: '" + node +  "'} },\n"
+    return(json0)
 
-drugs_d = {"alcohol":"alcohol|alcoholism",
+def generate_edges(data):
+    json0=str()
+    for line in  data.split("\n"):
+        if len(line.strip())!=0:
+            (source, cat, target, pmid, sent) = line.split("\t")
+            edgeID=source+"_"+target
+            json0+="{ data: { id: \'" + edgeID + "\', source: \'" + source + "\', target: '" + target + "\' } },\n"
+    return(json0)
+
+addiction_d = {"reward":"reward|reinforcement|conditioned place preference|CPP|self-administration|self-administered",
+        "aversion":"aversion|aversive|conditioned taste aversion|CTA|withdrawal",
+        "relapse":"relapse|reinstatement|craving|drug seeking",
+        "sensitization":"sensitization",
+        "addiction":"addiction|drug abuse",
+        "intoxication":"intoxication|binge",
+        }
+addiction=undic(addiction_d)
+
+drug_d = {"alcohol":"alcohol|alcoholism",
         "nicotine":"smoking|nicotine|tobacco",
-        "amphetamine":"methamphetamine|amphetamine",
+        "amphetamine":"methamphetamine|amphetamine|METH",
         "cocaine":"cocaine",
         "opioid":"opioid|fentanyl|oxycodone|oxycontin|heroin|morphine",
-        "cannabinoid":"marijuana|cannabinoid|Tetrahydrocannabinol|thc"
+        "cannabinoid":"marijuana|cannabinoid|tetrahydrocannabinol|thc|thc-9"
         }
-drugs=undic(drugs_d)
+drug=undic(drug_d)
 
 brain_d ={"cortex":"cortex|pfc|vmpfc|il|pl|prelimbic|infralimbic",
           "striatum":"striatum|STR",
@@ -88,24 +111,23 @@ brain_d ={"cortex":"cortex|pfc|vmpfc|il|pl|prelimbic|infralimbic",
 # brain region has too many short acronyms to just use the undic function, so search PubMed using the following 
 brain="cortex|accumbens|striatum|amygadala|hippocampus|tegmental|mesolimbic|infralimbic|prelimbic"
 
-biological_d={"plasticity":"LTP|LTD|plasticity|synaptic|epsp|epsc",
+function_d={"plasticity":"LTP|LTD|plasticity|synaptic|epsp|epsc",
             "neurotransmission": "neurotransmission|glutamate|GABA|cholinergic|serotoninergic",
             "signalling":"signalling|phosphorylation|glycosylation",
 #            "regulation":"increased|decreased|regulated|inhibited|stimulated",
             "transcription":"transcription|methylation|histone|ribosome",
             }
-biological=undic(biological_d)
+function=undic(function_d)
 
-report=str()
-out0=gene_addiction(gene)
-report+=out0
-out1=gene_anatomical(gene)
-report+=out1
-out2=gene_biological(gene)
-report+=out2
-with codecs.open(gene+"_addiction_sentences.tab", "w", encoding='utf8') as writer:
-   writer.write(report)
-   writer.close()
+#out1=gene_anatomical(gene)
+#out2=gene_functional(gene)
+#report=out0+out1+out2
+#with codecs.open(gene+"_addiction_sentences.tab", "w", encoding='utf8') as writer:
+#   writer.write(report)
+#   writer.close()
 
-
-
+n0=generate_nodes(function_d)
+n1=generate_nodes(addiction_d)
+n2=generate_nodes(drug_d)
+n3=generate_nodes(brain_d)
+default_nodes=n0+n1+n2+n3
