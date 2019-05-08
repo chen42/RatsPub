@@ -20,7 +20,8 @@
 				{ selector: 'edge',
 					css: {
 						'content': 'data(sentCnt)',
-						'curve-style': 'bezier'
+						'curve-style': 'bezier',
+			            'opacity': '0.3' 
 					}
 				},
 			{ selector: 'node.highlight',
@@ -35,7 +36,8 @@
         },
         {
             selector: 'edge.highlight',
-            style: { 'mid-target-arrow-color': '#FFF' }
+            style: { 'mid-target-arrow-color': '#FFF' },
+            style:{ 'opacity': '0.9' }
         },
         {
             selector: 'edge.semitransp',

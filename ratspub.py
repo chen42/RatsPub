@@ -15,7 +15,7 @@ def findWholeWord(w):
     return re.compile(r'\b({0})\b'.format(w), flags=re.IGNORECASE).search
 
 def getSentences(query, gene):
-    abstracts = os.popen("esearch -db pubmed -query " +  query + " | efetch -format uid |fetch-pubmed -path /run/media/hao/PubMed/Archive/ | xtract -pattern PubmedArticle -element MedlineCitation/PMID,ArticleTitle,AbstractText").read()
+    abstracts = os.popen("esearch -db pubmed -query " +  query + " | efetch -format uid |fetch-pubmed -path /run/media/hao/PubMed/Archive/ | xtract -pattern PubmedArticle -element MedlineCitation/PMID,ArticleTitle,AbstractText|sed \"s/-/ /g\"").read()
     out=str()
     for row in abstracts.split("\n"):
         tiab=row.split("\t")
@@ -25,7 +25,7 @@ def getSentences(query, gene):
         ## keep the sentence only if it contains the gene 
         for sent in sentences:
             if findWholeWord(gene)(sent):
-                sent=re.sub(r'\b(%s)\b' % gene, r'<b>\1</b>', sent, flags=re.I)
+                sent=re.sub(r'\b(%s)\b' % gene, r'<strong>\1</strong>', sent, flags=re.I)
                 out+=pmid+"\t"+sent+"\n"
     return(out)
 
@@ -40,8 +40,8 @@ def gene_addiction(gene):
                 sent=re.sub(r'\b(%s)\b' % drug_d[drug0], r'<b>\1</b>', sent, flags=re.I)
                 out+=gene+"\t"+"drug\t" + drug0+"\t"+sent+"\n"
         for add0 in addiction_d:
-            if findWholeWord(add0)(sent) :
-                sent=re.sub(r'\b(%s)\b' % add0, r'<b>\1</b>', sent, flags=re.I)
+            if findWholeWord(addiction_d[add0])(sent) :
+                sent=re.sub(r'\b(%s)\b' % addiction_d[add0], r'<b>\1</b>', sent, flags=re.I)
                 out+=gene+"\t"+"addiction\t"+add0+"\t"+sent+"\n"
     return(out)
 
@@ -92,39 +92,39 @@ def generate_edges(data):
 
 
 
-addiction_d = {"reward":"reward|reinforcement|conditioned place preference|CPP|self-administration|self-administered",
-        "aversion":"aversion|aversive|CTA|withdrawal",
-        "relapse":"relapse|reinstatement|craving|drug seeking",
+addiction_d = {"reward":"reward|hedonic|incentive|intracranial self stimulation|ICSS|reinforcement|conditioned place preference|CPP|self administration|self administered|drug reinforced|operant|instrumental response",
+        "aversion":"aversion|aversive|CTA|withdrawal|conditioned taste aversion",
+        "relapse":"relapse|reinstatement|craving|drug seeking|seeking",
         "sensitization":"sensitization",
-        "addiction":"addiction|drug abuse",
+        "addiction":"addiction|dependence|addictive|drug abuse|punishment|compulsive|escalation",
         "intoxication":"intoxication|binge"
         }
 addiction=undic(addiction_d)
 
-drug_d = {"alcohol":"alcohol|alcoholism",
+drug_d = {"alcohol":"alcohol|alcoholism|alcoholic",
         "nicotine":"smoking|nicotine|tobacco",
         "cocaine":"cocaine",
-        "opioid":"opioid|fentanyl|oxycodone|oxycontin|heroin|morphine",
+        "opioid":"opioid|opioids|fentanyl|oxycodone|oxycontin|heroin|morphine|methadone|buprenorphine",
         "amphetamine":"methamphetamine|amphetamine|METH",
-        "cannabinoid":"marijuana|cannabinoid|tetrahydrocannabinol|thc|thc-9"
+        "cannabinoid":"endocannabinoid|cannabinoids|endocannabinoids|marijuana|cannabidiol|cannabinoid|tetrahydrocannabinol|thc|thc 9|Oleoylethanolamide|palmitoylethanolamide|acylethanolamides"
         }
 drug=undic(drug_d)
 
-brain_d ={"cortex":"cortex|pfc|vmpfc|il|pl|prelimbic|infralimbic",
-          "striatum":"striatum|STR",
-          "accumbens":"shell|core|NAcc|acbs|acbc",
-          "hippocampus":"hippocampus|hipp|hip|ca1|ca3|dentate|gyrus",
-          "amygadala":"amygadala|cea|bla|amy",
-          "vta":"ventral tegmental|vta|pvta"
+brain_d ={"cortex":"cortex|prefrontal|pfc|mPFC|vmpfc|corticostriatal|cortico limbic|corticolimbic|prl|prelimbic|infralimbic|orbitofrontal|cingulate|cerebral|insular|insula",
+          "striatum":"striatum|STR|striatal|caudate|putamen",
+          "accumbens":"accumbens|accumbal|shell|core|Nacc|NacSh|acbs|acbc",
+          "hippocampus":"hippocampus|hippocampal|hipp|hip|ca1|ca3|dentate gyrus|subiculum|vhipp",
+          "amygdala":"amygdala|cea|bla|amy",
+          "vta":"ventral tegmental|vta|pvta|mesolimbic|limbic|midbrain|mesoaccumbens"
           }
 # brain region has too many short acronyms to just use the undic function, so search PubMed using the following 
 brain="cortex|accumbens|striatum|amygadala|hippocampus|tegmental|mesolimbic|infralimbic|prelimbic"
 
-function_d={"plasticity":"LTP|LTD|plasticity|synaptic|epsp|epsc",
-            "signalling":"signalling|phosphorylation|glycosylation",
+function_d={"neuroplasticity":"neuroplasticity|plasticity|long term potentiation|LTP|long term depression|LTD|synaptic|epsp|epsc|neurite|neurogenesis|boutons|mIPSC|IPSC|IPSP",
+            "signalling":"signalling|signaling|phosphorylation|glycosylation",
 #            "regulation":"increased|decreased|regulated|inhibited|stimulated",
-            "transcription":"transcription|methylation|histone|ribosome",
-            "neurotransmission": "neurotransmission|glutamate|GABA|cholinergic|serotoninergic",
+            "transcription":"transcription|methylation|hypomethylation|hypermethylation|histone|ribosome",
+            "neurotransmission": "neurotransmission|neuropeptides|neuropeptide|glutamate|glutamatergic|GABA|GABAergic|dopamine|dopaminergic|DAergic|cholinergic|nicotinic|muscarinic|serotonergic|serotonin|5 ht|acetylcholine",
             }
 function=undic(function_d)
 
