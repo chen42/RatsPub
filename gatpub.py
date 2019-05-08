@@ -39,7 +39,7 @@ def gene_addiction(gene):
             if findWholeWord(drug_d[drug0])(sent) :
                 sent=re.sub(r'\b(%s)\b' % drug_d[drug0], r'<b>\1</b>', sent, flags=re.I)
                 out+=gene+"\t"+"drug\t" + drug0+"\t"+sent+"\n"
-        for add0 in addiction.split("|"):
+        for add0 in addiction_d:
             if findWholeWord(add0)(sent) :
                 sent=re.sub(r'\b(%s)\b' % add0, r'<b>\1</b>', sent, flags=re.I)
                 out+=gene+"\t"+"addiction\t"+add0+"\t"+sent+"\n"
@@ -67,28 +67,37 @@ def gene_functional(gene):
                 out+=gene+"\t"+"function\t"+bio0+"\t"+sent+"\n"
     return(out)
 
-def generate_nodes(nodes_d):
+def generate_nodes(nodes_d, nodecolor):
     # include all search terms even if there are no edges, just to show negative result 
     json0 =str() #"{ data: { id: '" + gene +  "'} },\n"
     for node in nodes_d:
-        json0 += "{ data: { id: '" + node +  "'} },\n"
+        json0 += "{ data: { id: '" + node +  "', nodecolor: '" + nodecolor + "' } },\n"
     return(json0)
 
 def generate_edges(data):
     json0=str()
+    edgeCnts={}
     for line in  data.split("\n"):
         if len(line.strip())!=0:
             (source, cat, target, pmid, sent) = line.split("\t")
-            edgeID=source+"_"+target
-            json0+="{ data: { id: \'" + edgeID + "\', source: \'" + source + "\', target: '" + target + "\' } },\n"
+            edgeID=source+"|"+target
+            if edgeID in edgeCnts:
+                edgeCnts[edgeID]+=1
+            else:
+                edgeCnts[edgeID]=1
+    for edgeID in edgeCnts:
+        (source,target)=edgeID.split("|")
+        json0+="{ data: { id: \'" + edgeID + "\', source: \'" + source + "\', target: '" + target + "\', sentCnt: '" + str(edgeCnts[edgeID]) + "' } },\n"
     return(json0)
 
+
+
 addiction_d = {"reward":"reward|reinforcement|conditioned place preference|CPP|self-administration|self-administered",
-        "aversion":"aversion|aversive|conditioned taste aversion|CTA|withdrawal",
+        "aversion":"aversion|aversive|CTA|withdrawal",
         "relapse":"relapse|reinstatement|craving|drug seeking",
         "sensitization":"sensitization",
         "addiction":"addiction|drug abuse",
-        "intoxication":"intoxication|binge",
+        "intoxication":"intoxication|binge"
         }
 addiction=undic(addiction_d)
 
@@ -119,15 +128,9 @@ function_d={"plasticity":"LTP|LTD|plasticity|synaptic|epsp|epsc",
             }
 function=undic(function_d)
 
-#out1=gene_anatomical(gene)
-#out2=gene_functional(gene)
-#report=out0+out1+out2
-#with codecs.open(gene+"_addiction_sentences.tab", "w", encoding='utf8') as writer:
-#   writer.write(report)
-#   writer.close()
-
-n0=generate_nodes(function_d)
-n1=generate_nodes(addiction_d)
-n2=generate_nodes(drug_d)
-n3=generate_nodes(brain_d)
+#https://htmlcolorcodes.com/
+n0=generate_nodes(function_d, "#D7BDE2")
+n1=generate_nodes(addiction_d,"#A9CCE3")
+n2=generate_nodes(drug_d, "#A3E4D7")
+n3=generate_nodes(brain_d, "#F9E79F")
 default_nodes=n0+n1+n2+n3

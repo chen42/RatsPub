@@ -20,7 +20,7 @@ def network():
     if request.method == 'POST':
         term = request.form
         gene=term['query']
-        nodes="{ data: { id: '" + gene +  "'} },\n" + default_nodes
+        nodes="{ data: { id: '" + gene +  "', nodecolor:'#FADBD8'} },\n" + default_nodes
         tmp0=gene_addiction(gene)
         e0=generate_edges(tmp0)
         tmp1=gene_functional(gene)
