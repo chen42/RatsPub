@@ -37,10 +37,12 @@ def gene_addiction(gene):
     for sent in sents.split("\n"):
         for drug0 in drug_d:
             if findWholeWord(drug_d[drug0])(sent) :
+                sent=sent.replace("<b>","").replace("</b>","")
                 sent=re.sub(r'\b(%s)\b' % drug_d[drug0], r'<b>\1</b>', sent, flags=re.I)
                 out+=gene+"\t"+"drug\t" + drug0+"\t"+sent+"\n"
         for add0 in addiction_d:
             if findWholeWord(addiction_d[add0])(sent) :
+                sent=sent.replace("<b>","").replace("</b>","")
                 sent=re.sub(r'\b(%s)\b' % addiction_d[add0], r'<b>\1</b>', sent, flags=re.I)
                 out+=gene+"\t"+"addiction\t"+add0+"\t"+sent+"\n"
     return(out)
@@ -52,6 +54,7 @@ def gene_anatomical(gene):
     for sent in sents.split("\n"):
         for brain0 in brain_d:
             if findWholeWord(brain_d[brain0])(sent) :
+                sent=sent.replace("<b>","").replace("</b>","")
                 sent=re.sub(r'\b(%s)\b' % brain_d[brain0], r'<b>\1</b>', sent, flags=re.I)
                 out+=gene+"\t"+"brain\t"+brain0+"\t"+sent+"\n"
     return(out)
@@ -63,6 +66,7 @@ def gene_functional(gene):
     for sent in sents.split("\n"):
         for bio0 in function_d:
             if findWholeWord(function_d[bio0])(sent) :
+                sent=sent.replace("<b>","").replace("</b>","")
                 sent=re.sub(r'\b(%s)\b' % function_d[bio0], r'<b>\1</b>', sent, flags=re.I)
                 out+=gene+"\t"+"function\t"+bio0+"\t"+sent+"\n"
     return(out)
@@ -111,9 +115,9 @@ drug_d = {"alcohol":"alcohol|alcoholism|alcoholic",
 drug=undic(drug_d)
 
 brain_d ={"cortex":"cortex|prefrontal|pfc|mPFC|vmpfc|corticostriatal|cortico limbic|corticolimbic|prl|prelimbic|infralimbic|orbitofrontal|cingulate|cerebral|insular|insula",
-          "striatum":"striatum|STR|striatal|caudate|putamen",
+          "striatum":"striatum|STR|striatal|caudate|putamen|basal ganglia|globus pallidus",
           "accumbens":"accumbens|accumbal|shell|core|Nacc|NacSh|acbs|acbc",
-          "hippocampus":"hippocampus|hippocampal|hipp|hip|ca1|ca3|dentate gyrus|subiculum|vhipp",
+          "hippocampus":"hippocampus|hippocampal|hipp|hip|ca1|ca3|dentate gyrus|subiculum|vhipp|dhpc|vhpc",
           "amygdala":"amygdala|cea|bla|amy",
           "vta":"ventral tegmental|vta|pvta|mesolimbic|limbic|midbrain|mesoaccumbens"
           }
