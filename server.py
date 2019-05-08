@@ -19,14 +19,21 @@ def network():
     nodes_list=[]
     if request.method == 'POST':
         term = request.form
-        gene=term['query']
-        nodes="{ data: { id: '" + gene +  "', nodecolor:'#FADBD8'} },\n" + default_nodes
-        tmp0=gene_addiction(gene)
-        e0=generate_edges(tmp0)
-        tmp1=gene_functional(gene)
-        e1=generate_edges(tmp1)
-        tmp2=gene_anatomical(gene)
-        e2=generate_edges(tmp2)
-        return render_template('network.html', elements=nodes+e0+e1+e2)
+        genes=term['query']
+        genes=genes.replace(",", " ")
+        genes=genes.replace(";", " ")
+        genes=genes.split()
+        nodes=default_nodes
+        edges=str()
+        for  gene in genes:
+            nodes+="{ data: { id: '" + gene +  "', nodecolor:'#FADBD8', fontweight:700} },\n"
+            tmp0=gene_addiction(gene)
+            e0=generate_edges(tmp0)
+            tmp1=gene_functional(gene)
+            e1=generate_edges(tmp1)
+            tmp2=gene_anatomical(gene)
+            e2=generate_edges(tmp2)
+            edges+=e0+e1+e2
+        return render_template('network.html', elements=nodes+edges)
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<script type="text/javascript" src="{{ url_for('static', filename='cytoscape.min.js') }}"></script>
+
+
+    <div id="cy"></div>
+    <script>
+      var cy = cytoscape({
+        container: document.getElementById('cy'),
+
+		style: [
+			{ selector: 'node',
+			  css: {
+				'content': 'data(id)',
+				'text-valign': 'center',
+				'text-halign': 'center',
+                'background-color': 'data(nodecolor)',
+				'font-weight': 'data(fontweight)'
+			  }
+			},
+		
+			{ selector: 'edge',
+			  css: {
+				'content': 'data(sentCnt)',
+				'curve-style': 'bezier',
+    			"opacity": "0.4",
+			  }
+			}
+		],
+	    elements:[ {{ elements | safe }} ], 
+	
+	    layout: {
+			name: 'concentric',
+			concentric: function( node ){
+			  return node.degree();
+        	},
+			levelWidth: function( nodes ){
+			  return 2;
+			}
+      	},
+
+	  });
+    </script>
+
+{% endblock %}
