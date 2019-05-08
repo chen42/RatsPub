@@ -2,45 +2,68 @@
 {% block content %}
 
 <script type="text/javascript" src="{{ url_for('static', filename='cytoscape.min.js') }}"></script>
-
-
-    <div id="cy"></div>
-    <script>
-      var cy = cytoscape({
-        container: document.getElementById('cy'),
-
-		style: [
-			{ selector: 'node',
-			  css: {
-				'content': 'data(id)',
-				'text-valign': 'center',
-				'text-halign': 'center',
-                'background-color': 'data(nodecolor)',
-				'font-weight': 'data(fontweight)'
-			  }
-			},
-		
-			{ selector: 'edge',
-			  css: {
-				'content': 'data(sentCnt)',
-				'curve-style': 'bezier',
-    			"opacity": "0.4",
-			  }
+	<div id="cy"></div>
+	<script>
+		var cy = cytoscape({
+			container: document.getElementById('cy'),
+			style: [
+				{ selector: 'node',
+					css: {
+						'content': 'data(id)',
+						'text-valign': 'center',
+						'text-halign': 'center',
+						'background-color': 'data(nodecolor)',
+						'font-weight': 'data(fontweight)',
+						'font-size': '20%'
+					}
+				},
+				{ selector: 'edge',
+					css: {
+						'content': 'data(sentCnt)',
+						'curve-style': 'bezier'
+					}
+				},
+			{ selector: 'node.highlight',
+            style: {
+                'border-color': '#FFF',
+                'border-width': '2px'
+            }
+        },
+        {
+            selector: 'node.semitransp',
+            style:{ 'opacity': '0.5' }
+        },
+        {
+            selector: 'edge.highlight',
+            style: { 'mid-target-arrow-color': '#FFF' }
+        },
+        {
+            selector: 'edge.semitransp',
+            style:{ 'opacity': '0.2' }
+        }
+			],
+			elements:[ {{ elements | safe }} ], 
+			layout: {
+				name: 'circle'
 			}
-		],
-	    elements:[ {{ elements | safe }} ], 
-	
-	    layout: {
-			name: 'concentric',
-			concentric: function( node ){
-			  return node.degree();
-        	},
-			levelWidth: function( nodes ){
-			  return 2;
+		});
+		cy.on('tap', 'edge', function(){
+			try { // your browser may block popups
+				window.open( this.data('url') );
+			} catch(e){ // fall back on url change
+				window.location.href = this.data('url');
 			}
-      	},
-
-	  });
+	  	});
+		cy.on('mouseover', 'node', function(e){
+			var sel = e.target;
+			cy.elements().difference(sel.outgoers()).not(sel).addClass('semitransp');
+			sel.addClass('highlight').outgoers().addClass('highlight');
+		});
+		cy.on('mouseout', 'node', function(e){
+			var sel = e.target;
+			cy.elements().removeClass('semitransp');
+			sel.removeClass('highlight').outgoers().removeClass('highlight');
+		});
     </script>
 
 {% endblock %}

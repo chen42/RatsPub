@@ -26,7 +26,7 @@ def getSentences(query, gene):
         for sent in sentences:
             if findWholeWord(gene)(sent):
                 sent=re.sub(r'\b(%s)\b' % gene, r'<b>\1</b>', sent, flags=re.I)
-                out+=pmid+"\t"+sent+"<br>\n"
+                out+=pmid+"\t"+sent+"\n"
     return(out)
 
 def gene_addiction(gene):
@@ -87,7 +87,7 @@ def generate_edges(data):
                 edgeCnts[edgeID]=1
     for edgeID in edgeCnts:
         (source,target)=edgeID.split("|")
-        json0+="{ data: { id: \'" + edgeID + "\', source: \'" + source + "\', target: '" + target + "\', sentCnt: '" + str(edgeCnts[edgeID]) + "' } },\n"
+        json0+="{ data: { id: \'" + edgeID + "\', source: \'" + source + "\', target: '" + target + "\', sentCnt: '" + str(edgeCnts[edgeID]) + "',  url:'/sentences?edgeID=" + edgeID + "' } },\n"
     return(json0)
 
 
@@ -103,9 +103,9 @@ addiction=undic(addiction_d)
 
 drug_d = {"alcohol":"alcohol|alcoholism",
         "nicotine":"smoking|nicotine|tobacco",
-        "amphetamine":"methamphetamine|amphetamine|METH",
         "cocaine":"cocaine",
         "opioid":"opioid|fentanyl|oxycodone|oxycontin|heroin|morphine",
+        "amphetamine":"methamphetamine|amphetamine|METH",
         "cannabinoid":"marijuana|cannabinoid|tetrahydrocannabinol|thc|thc-9"
         }
 drug=undic(drug_d)
@@ -121,10 +121,10 @@ brain_d ={"cortex":"cortex|pfc|vmpfc|il|pl|prelimbic|infralimbic",
 brain="cortex|accumbens|striatum|amygadala|hippocampus|tegmental|mesolimbic|infralimbic|prelimbic"
 
 function_d={"plasticity":"LTP|LTD|plasticity|synaptic|epsp|epsc",
-            "neurotransmission": "neurotransmission|glutamate|GABA|cholinergic|serotoninergic",
             "signalling":"signalling|phosphorylation|glycosylation",
 #            "regulation":"increased|decreased|regulated|inhibited|stimulated",
             "transcription":"transcription|methylation|histone|ribosome",
+            "neurotransmission": "neurotransmission|glutamate|GABA|cholinergic|serotoninergic",
             }
 function=undic(function_d)
 
