@@ -1,0 +1,26 @@
+#cy {
+	width: 80%;
+	height: 90%;
+	position: absolute;
+	left: 0px;
+}
+
+
+a:link {
+    color:grey ;
+}
+
+/* A link that has been visited */
+a:visited {
+    color: grey;
+}
+
+/* A link that is hovered on */
+a:hover {
+    color: blue;
+}
+
+/* A link that is selected */
+a:active {
+    color: blue;
+}

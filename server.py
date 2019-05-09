@@ -22,7 +22,8 @@ def search():
     genes=genes.replace(";", " ")
     genes=genes.split()
     if len(genes)>=6:
-        return render_template('index.html')
+        message="<span class='text-danger'>Up to five terms can be searched at a time</span>"
+        return render_template('index.html', message=message)
     nodes=default_nodes
     edges=str()
     for  gene in genes:
