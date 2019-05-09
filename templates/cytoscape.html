@@ -15,13 +15,14 @@
 						'text-halign': 'center',
 						'background-color': 'data(nodecolor)',
 						'font-weight': 'data(fontweight)',
-						'font-size': '20%'
+						'font-size': '9%'
 					}
 				},
 				{ selector: 'edge',
 					css: {
 						'content': 'data(sentCnt)',
 						'curve-style': 'bezier',
+						'line-cap': 'round',
 			            'opacity': 'mapData(sentCnt, 1, 50, 0.2, 0.3)', 
 					}
 				},
@@ -47,8 +48,16 @@
 			],
 			elements:[ {{ elements | safe }} ], 
 			layout: {
-				name: 'circle'
+				name: 'concentric',
+				concentric: function( node ){
+				  return node.degree();
+				},
+				levelWidth: function( nodes ){
+				  return 7;
+				}
 			}
+
+
 		});
 
 		cy.on('tap', 'edge', function(){
