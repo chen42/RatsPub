@@ -22,7 +22,7 @@
 					css: {
 						'content': 'data(sentCnt)',
 						'curve-style': 'bezier',
-			            'opacity': '0.3' 
+			            'opacity': 'mapData(sentCnt, 1, 50, 0.2, 0.3)', 
 					}
 				},
 			{ selector: 'node.highlight',
@@ -50,7 +50,15 @@
 				name: 'circle'
 			}
 		});
+
 		cy.on('tap', 'edge', function(){
+			try { // your browser may block popups
+				window.open( this.data('url') );
+			} catch(e){ // fall back on url change
+				window.location.href = this.data('url');
+			}
+	  	});
+		cy.on('tap', 'node', function(){
 			try { // your browser may block popups
 				window.open( this.data('url') );
 			} catch(e){ // fall back on url change
