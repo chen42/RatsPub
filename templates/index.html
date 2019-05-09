@@ -2,10 +2,26 @@
 {% block content %}
 <p>
 
-    <form class="form-inline my-2 my-lg-0" action="/search">
-      <input name="query" class="form-control mr-sm-2" type="search" placeholder="Rgma Nrxn3" aria-label="search" value="Rgma Nrxn3">
+    <form action="/search">
+      <input name="query" class="form-control form-control-lg" type="search" placeholder="e.g., Rgma Nrxn3, up to 5 terms are allowed" aria-label="search" value="">
       <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
     </form>
+	<br>
+	This app searches PubMed to find <u>sentences</u> that contain the query terms (e.g., gene symbols) and  a drug addiction related keyword.  <a href="https://github.com/chen42/RatsPub/blob/master/ratspub.py#L95-L129">These keywords</a> belong to the following categories:  
+<ul>
+<li> names of abused drugs, e.g., opioids</li>
+<li> terms describing addiction, e.g., relapse </li>
+<li> key brain regions implicated in addiction, e.g., ventral striatum </li>
+<li> neurotrasmission, e.g., dopaminergic </li>
+<li> synaptic plasticity, e.g., long term potentiation </li> 
+<li> intracellular signaling, e.g., phosphorylation </li>
+</ul>
+
+<br> 
+Live searches are conducted through PubMed to get relevant PMIDs, which are then used to retrieve the abstracts from a <a href="https://dataguide.nlm.nih.gov/edirect/archive.html">local archive</a>. The relationships are presented as an interactive <a href="https://js.cytoscape.org" >cytoscape</a> graph. The nodes can be moved around to better reveal the connections.  Clicking on the links will bring up the corresponding sentences in a new browser window. 
+<p>
+<hr>
+<a href="https://github.com/chen42/ratspub"> Source code </a>
 
 {% endblock %}
 

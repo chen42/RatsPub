@@ -2,10 +2,6 @@
 from nltk.tokenize import sent_tokenize
 import os
 import re
-import codecs
-import sys
-
-#gene=sys.argv[1]
 
 ## turn dictionary (synonyms) to regular expression
 def undic(dic):
@@ -93,8 +89,6 @@ def generate_edges(data):
         (source,target)=edgeID.split("|")
         json0+="{ data: { id: \'" + edgeID + "\', source: \'" + source + "\', target: '" + target + "\', sentCnt: '" + str(edgeCnts[edgeID]) + "',  url:'/sentences?edgeID=" + edgeID + "' } },\n"
     return(json0)
-
-
 
 addiction_d = {"reward":"reward|hedonic|incentive|intracranial self stimulation|ICSS|reinforcement|conditioned place preference|CPP|self administration|self administered|drug reinforced|operant|instrumental response",
         "aversion":"aversion|aversive|CTA|withdrawal|conditioned taste aversion",

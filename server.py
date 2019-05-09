@@ -1,6 +1,5 @@
 #!/bin/env  python3
 from flask import Flask, render_template, request, redirect
-import simplejson as json
 from ratspub import *
 
 app=Flask(__name__)
@@ -18,6 +17,8 @@ def search():
     genes=genes.replace(",", " ")
     genes=genes.replace(";", " ")
     genes=genes.split()
+    if len(genes)>=6: 
+        return render_template('index.html')
     nodes=default_nodes
     edges=str()
     for  gene in genes:
@@ -30,9 +31,9 @@ def search():
         e2=generate_edges(sent2)
         edges+=e0+e1+e2
         all_sentences+=sent0+sent1+sent2
-    f=open("all_sentences.tab","w")
-    f.write(all_sentences)
-    f.close()
+    #f=open("all_sentences.tab","w")
+    #f.write(all_sentences)
+    #f.close()
     return render_template('cytoscape.html', elements=nodes+edges)
 
 @app.route("/sentences")
@@ -42,12 +43,11 @@ def sentences():
     print (gene0 + cat0)
     out="<h3>"+gene0 + " and " + cat0  + "</h3>\n"
     for sent in all_sentences.split("\n"):
-        #print (sent) 
         if len(sent.strip())!=0:
            (gene,nouse,cat, pmid, text)=sent.split("\t") 
            if (gene == gene0 and cat == cat0) :
                out+= "<li> "+ text + " <a href=\"https://www.ncbi.nlm.nih.gov/pubmed/?term=" + pmid +"\" target=_new>PMID:"+pmid+"<br></a>"
-    return render_template('sentences.html', sentences=out+"<p>")
+    return render_template('sentences.html', sentences="<ol>"+out+"</ol><p>")
 
 if __name__ == '__main__':
     app.run(debug=True)
