@@ -105,7 +105,7 @@ addiction=undic(addiction_d)
 drug_d = {"alcohol":"alcohol|alcoholism|alcoholic",
         "nicotine":"smoking|nicotine|tobacco",
         "cocaine":"cocaine",
-        "opioid":"opioid|opioids|fentanyl|oxycodone|oxycontin|heroin|morphine|methadone|buprenorphine",
+        "opioid":"opioid|opioids|fentanyl|oxycodone|oxycontin|heroin|morphine|methadone|buprenorphine|vicodin|hydrocodone|hycodan|kadian|percoset|hydromorphone|naloxone|codeine|suboxone|tramadol|kratom",
         "amphetamine":"methamphetamine|amphetamine|METH",
         "cannabinoid":"endocannabinoid|cannabinoids|endocannabinoids|marijuana|cannabidiol|cannabinoid|tetrahydrocannabinol|thc|thc 9|Oleoylethanolamide|palmitoylethanolamide|acylethanolamides"
         }
