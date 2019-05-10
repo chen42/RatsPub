@@ -21,9 +21,10 @@
 				{ selector: 'edge',
 					css: {
 						'content': 'data(sentCnt)',
-						'curve-style': 'bezier',
-						'line-cap': 'round',
-			            'opacity': 'mapData(sentCnt, 1, 50, 0.2, 0.3)', 
+						'line-color':'black',
+			            'opacity': 'mapData(sentCnt, 1, 50, 0.3, 1)', 
+			            'width': 'mapData(sentCnt, 1, 50, 0.3, 4)', 
+						'font-size': '9%'
 					}
 				},
 			{ selector: 'node.highlight',
@@ -38,12 +39,11 @@
         },
         {
             selector: 'edge.highlight',
-            style: { 'mid-target-arrow-color': '#FFF' },
-            style:{ 'opacity': '0.9' }
+            style: { 'line-color': 'red' },
         },
         {
             selector: 'edge.semitransp',
-            style:{ 'opacity': '0.2' }
+            style:{ 'opacity': '0.01' }
         }
 			],
 			elements:[ {{ elements | safe }} ], 
@@ -53,7 +53,7 @@
 				  return node.degree();
 				},
 				levelWidth: function( nodes ){
-				  return 7;
+				  return 6;
 				}
 			}
 

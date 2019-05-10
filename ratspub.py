@@ -90,10 +90,10 @@ def generate_edges(data, filename):
                 edgeCnts[edgeID]=1
     for edgeID in edgeCnts:
         (filename, source,target)=edgeID.split("|")
-        json0+="{ data: { id: '" + edgeID + "', source: '" + source + "', target: '" + target + "', sentCnt: '" + str(edgeCnts[edgeID]) + "',  url:'/sentences?edgeID=" + edgeID + "' } },\n"
+        json0+="{ data: { id: '" + edgeID + "', source: '" + source + "', target: '" + target + "', sentCnt: " + str(edgeCnts[edgeID]) + ",  url:'/sentences?edgeID=" + edgeID + "' } },\n"
     return(json0)
 
-addiction_d = {"reward":"reward|hedonic|incentive|intracranial self stimulation|ICSS|reinforcement|conditioned place preference|CPP|self administration|self administered|drug reinforced|operant|instrumental response",
+addiction_d = {"reward":"reward|hedonic|incentive|intracranial self stimulation|ICSS|reinforcement|reinforcing|conditioned place preference|CPP|self administration|self administered|drug reinforced|operant|instrumental response",
         "aversion":"aversion|aversive|CTA|withdrawal|conditioned taste aversion",
         "relapse":"relapse|reinstatement|craving|drug seeking|seeking",
         "sensitization":"sensitization",
