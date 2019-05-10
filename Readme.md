@@ -14,4 +14,4 @@ Live searches are conducted through PubMed to get relevant PMIDs, which are then
 
 * [local copy of PubMed](https://dataguide.nlm.nih.gov/edirect/archive.html)
 * python flask
-* cytoscape.js
+* python nltk
