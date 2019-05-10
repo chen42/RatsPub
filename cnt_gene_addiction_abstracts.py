@@ -8,6 +8,10 @@ from ratspub  import *
 def gene_addiction_cnt(gene):
     q="\"(" + addiction.replace("|", "[tiab] OR ")  + ") AND (" + drug.replace("|", "[tiab] OR ", ) + ") AND (" + gene + ")\""
     count=os.popen('esearch -db pubmed  -query ' + q + ' | xtract -pattern ENTREZ_DIRECT -element Count ').read()
+    if (len(count)==0):
+        print("pause")
+        time.sleep(15)
+        gene_addiction_cnt(gene)
     return (count)
 
 out=open("gene_addiction_cnt_result_part1.tab", "w+")
@@ -25,9 +29,6 @@ with open ("./ncbi_gene_symb_syno_txid9606_part1.txt", "r") as f:
             gene_q=gene.replace("|", " [tiab] OR ")
             gene_q+="[tiab]"
             count=gene_addiction_cnt(gene_q)
-            if (len(count)==0):
-                print("pause")
-                time.sleep(10)
             print(gene+"\t"+count)
             out.write(gene+"\t"+count)
 
