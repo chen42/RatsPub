@@ -47,9 +47,9 @@ def search():
         progress=0
         for  gene in genes:
             nodes+="{ data: { id: '" + gene +  "', nodecolor:'#FADBD8', fontweight:700, url:'https://www.ncbi.nlm.nih.gov/gene/?term="+gene+"'} },\n"
-            sent0=gene_addiction(gene)
             progress+=percent
             yield "data:"+str(progress)+"\n\n"
+            sent0=gene_addiction(gene)
             e0=generate_edges(sent0, tf_name)
             sent1=gene_functional(gene)
             progress+=percent
@@ -96,7 +96,6 @@ def shownode():
     allnodes={**brain_d, **drug_d, **function_d, **addiction_d}
     out="<p>"+node.upper()+"<hr><li>"+ allnodes[node].replace("|", "<li>")
     return render_template('sentences.html', sentences=out+"<p>")
-
 
 if __name__ == '__main__':
     app.run(debug=True)
