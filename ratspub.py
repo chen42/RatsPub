@@ -106,7 +106,7 @@ drug_d = {"alcohol":"alcohol|alcoholism|alcoholic",
         "nicotine":"smoking|nicotine|tobacco",
         "cocaine":"cocaine",
         "opioid":"opioid|opioids|fentanyl|oxycodone|oxycontin|heroin|morphine|methadone|buprenorphine|vicodin|hydrocodone|hycodan|kadian|percoset|hydromorphone|naloxone|codeine|suboxone|tramadol|kratom",
-        "amphetamine":"methamphetamine|amphetamine|METH",
+        "amphetamine":"methamphetamine|amphetamine|METH|AMPH",
         "cannabinoid":"endocannabinoid|cannabinoids|endocannabinoids|marijuana|cannabidiol|cannabinoid|tetrahydrocannabinol|thc|thc 9|Oleoylethanolamide|palmitoylethanolamide|acylethanolamides"
         }
 drug=undic(drug_d)
@@ -121,11 +121,11 @@ brain_d ={"cortex":"cortex|prefrontal|pfc|mPFC|vmpfc|corticostriatal|cortico lim
 # brain region has too many short acronyms to just use the undic function, so search PubMed using the following 
 brain="cortex|accumbens|striatum|amygadala|hippocampus|tegmental|mesolimbic|infralimbic|prelimbic"
 
-function_d={"neuroplasticity":"neuroplasticity|plasticity|long term potentiation|LTP|long term depression|LTD|synaptic|epsp|epsc|neurite|neurogenesis|boutons|mIPSC|IPSC|IPSP",
-            "signalling":"signalling|signaling|phosphorylation|glycosylation",
-#            "regulation":"increased|decreased|regulated|inhibited|stimulated",
+function_d={"signalling":"signalling|signaling|phosphorylation|glycosylation",
             "transcription":"transcription|methylation|hypomethylation|hypermethylation|histone|ribosome",
+            "neuroplasticity":"neuroplasticity|plasticity|long term potentiation|LTP|long term depression|LTD|synaptic|epsp|epsc|neurite|neurogenesis|boutons|mIPSC|IPSC|IPSP",
             "neurotransmission": "neurotransmission|neuropeptides|neuropeptide|glutamate|glutamatergic|GABA|GABAergic|dopamine|dopaminergic|DAergic|cholinergic|nicotinic|muscarinic|serotonergic|serotonin|5 ht|acetylcholine",
+#            "regulation":"increased|decreased|regulated|inhibited|stimulated",
             }
 function=undic(function_d)
 
