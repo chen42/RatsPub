@@ -18,8 +18,6 @@ def root():
 def about():
     return render_template('about.html')
 
-
-
 @app.route('/progress')
 def progress():
     # only 1-6 terms are allowed
@@ -43,7 +41,7 @@ def progress():
 @app.route("/search")
 def search():
     genes=session['query']
-    percent=round(100/(len(genes)*3),1)
+    percent=round(100/(len(genes)*4),1)
     snt_file=session['path']+"_snt"
     cysdata=open(session['path']+"_cy","w+")
     sntdata=open(snt_file,"w+")
@@ -53,20 +51,32 @@ def search():
         nodes=default_nodes
         progress=0
         for  gene in genes:
+            gene=gene.replace("-"," ")
             nodes+="{ data: { id: '" + gene +  "', nodecolor:'#E74C3C', fontweight:700, url:'/gene_gene?gene="+gene+"'} },\n"
+            # report progress immediately
             progress+=percent
             yield "data:"+str(progress)+"\n\n"
-            sent0=gene_addiction(gene)
+            addiction=undic(addiction_d)
+            sent0=gene_category(gene, addiction_d, addiction, "addiction")
             e0=generate_edges(sent0, tf_name)
-            sent1=gene_functional(gene)
+            #  
+            function=undic(function_d)
+            sent1=gene_category(gene, function_d, function, "function")
             progress+=percent
             yield "data:"+str(progress)+"\n\n"
             e1=generate_edges(sent1, tf_name)
-            sent2=gene_anatomical(gene)
+            #
+            drug=undic(drug_d)
+            sent2=gene_category(gene, drug_d, drug, "drug")
             progress+=percent
+            yield "data:"+str(progress)+"\n\n"
             e2=generate_edges(sent2, tf_name)
-            edges+=e0+e1+e2
-            sentences+=sent0+sent1+sent2
+            # brain has its own query terms that does not include the many short acronyms
+            sent3=gene_category(gene, brain_d, brain_query_term, "brain")
+            progress+=percent
+            e3=generate_edges(sent3, tf_name)
+            edges+=e0+e1+e2+e3
+            sentences+=sent0+sent1+sent2+sent3
             #save data before the last yield
             if (progress>99):
                 progress=100

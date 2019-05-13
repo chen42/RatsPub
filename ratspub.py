@@ -3,7 +3,7 @@ from nltk.tokenize import sent_tokenize
 import os
 import re
 
-global function_d, brain_d, drug_d, addiction_d
+global function_d, brain_d, drug_d, addiction_d, brain_query_term
 
 ## turn dictionary (synonyms) to regular expression
 def undic(dic):
@@ -27,46 +27,17 @@ def getSentences(query, gene):
                 out+=pmid+"\t"+sent+"\n"
     return(out)
 
-def gene_addiction(gene):
-    # search gene name & drug name  in the context of addiction terms (i.e., exclude etoh affects cancer, or methods to extract cocaine) 
-    q="\"(" + addiction.replace("|", " OR ")  + ") AND (" + drug.replace("|", " OR ", ) + ") AND " + gene + "\""
+def gene_category(gene, cat_d, query, cat):
+    #e.g. BDNF, addiction_d, undic(addiction_d) "addiction"
+    q="\"(" + query.replace("|", " OR ")  + ") AND " + gene + "\""
     sents=getSentences(q, gene)
     out=str()
     for sent in sents.split("\n"):
-        for drug0 in drug_d:
-            if findWholeWord(drug_d[drug0])(sent) :
-                sent=sent.replace("<b>","").replace("</b>","")
-                sent=re.sub(r'\b(%s)\b' % drug_d[drug0], r'<b>\1</b>', sent, flags=re.I)
-                out+=gene+"\t"+"drug\t" + drug0+"\t"+sent+"\n"
-        for add0 in addiction_d:
-            if findWholeWord(addiction_d[add0])(sent) :
-                sent=sent.replace("<b>","").replace("</b>","")
-                sent=re.sub(r'\b(%s)\b' % addiction_d[add0], r'<b>\1</b>', sent, flags=re.I)
-                out+=gene+"\t"+"addiction\t"+add0+"\t"+sent+"\n"
-    return(out)
-
-def gene_anatomical(gene):
-    q="\"(" + brain.replace("|", " OR ")  + ") AND " + gene + "\""
-    sents=getSentences(q,gene)
-    out=str()
-    for sent in sents.split("\n"):
-        for brain0 in brain_d:
-            if findWholeWord(brain_d[brain0])(sent) :
-                sent=sent.replace("<b>","").replace("</b>","")
-                sent=re.sub(r'\b(%s)\b' % brain_d[brain0], r'<b>\1</b>', sent, flags=re.I)
-                out+=gene+"\t"+"brain\t"+brain0+"\t"+sent+"\n"
-    return(out)
-
-def gene_functional(gene):
-    q="\"(" + function.replace("|", " OR ")  + ") AND " + gene + "\""
-    sents=getSentences(q,gene)
-    out=str()
-    for sent in sents.split("\n"):
-        for bio0 in function_d:
-            if findWholeWord(function_d[bio0])(sent) :
-                sent=sent.replace("<b>","").replace("</b>","")
-                sent=re.sub(r'\b(%s)\b' % function_d[bio0], r'<b>\1</b>', sent, flags=re.I)
-                out+=gene+"\t"+"function\t"+bio0+"\t"+sent+"\n"
+        for key in cat_d:
+            if findWholeWord(cat_d[key])(sent) :
+                sent=sent.replace("<b>","").replace("</b>","") # remove other highlights
+                sent=re.sub(r'\b(%s)\b' % cat_d[key], r'<b>\1</b>', sent, flags=re.I) # highlight keyword
+                out+=gene+"\t"+ cat + "\t"+key+"\t"+sent+"\n"
     return(out)
 
 def generate_nodes(nodes_d, nodetype):
@@ -117,7 +88,7 @@ brain_d ={"cortex":"cortex|prefrontal|pfc|mPFC|vmpfc|corticostriatal|cortico lim
           "vta":"ventral tegmental|vta|pvta|mesolimbic|limbic|midbrain|mesoaccumbens"
           }
 # brain region has too many short acronyms to just use the undic function, so search PubMed using the following 
-brain="cortex|accumbens|striatum|amygadala|hippocampus|tegmental|mesolimbic|infralimbic|prelimbic"
+brain_query_term="cortex|accumbens|striatum|amygadala|hippocampus|tegmental|mesolimbic|infralimbic|prelimbic"
 function_d={"signalling":"signalling|signaling|phosphorylation|glycosylation",
             "transcription":"transcription|methylation|hypomethylation|hypermethylation|histone|ribosome",
             "neuroplasticity":"neuroplasticity|plasticity|long term potentiation|LTP|long term depression|LTD|synaptic|epsp|epsc|neurite|neurogenesis|boutons|mIPSC|IPSC|IPSP",
