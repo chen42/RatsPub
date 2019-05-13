@@ -1,26 +1,18 @@
 {% extends "layout.html" %}
 {% block content %}
-<p>
-<br>
 {{ message | safe }}
+
+<h3> <u>R</u>elationship  with <u>A</u>ddiction <u>T</u>hrough <u>S</u>earches of <u>Pub</u>Med </span></a>
+</h3>
+ 
+
+	This app searches PubMed to find <i>sentences</i> that contain the query terms (e.g., gene symbols) and  <a href="https://github.com/chen42/RatsPub/blob/master/ratspub.py#L95-L129">keywords</a> related to drug addiction.
+<br> 
+	<p>
     <form action="/progress">
       <input name="query" class="form-control form-control-lg" type="search" placeholder="Rgma Nrxn3" aria-label="search" value="">
       <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
     </form>
-	<br>
-	This app searches PubMed to find <i>sentences</i> that contain the query terms (e.g., gene symbols) and  <a href="https://github.com/chen42/RatsPub/blob/master/ratspub.py#L95-L129">keywords</a> related to drug addiction.
-	<p>
-<br> 
-Searches are conducted through PubMed to get relevant PMIDs, which are then used to retrieve the abstracts from a <a href="https://dataguide.nlm.nih.gov/edirect/archive.html">local archive</a>. The gene-keyword relationships are presented as an interactive <a href="https://js.cytoscape.org" >cytoscape</a> graph. The nodes can be moved to better reveal the connections.  Tap on the links will bring up the corresponding sentences in a new browser window. 
-<p>
-
-    <form action="/gene_gene">
-      <input name="gene" class="form-control form-control-lg" type="search" placeholder="Rgma Nrxn3" aria-label="search" value="Nrxn1">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-    </form>
-	
-<hr>
-<a href="https://github.com/chen42/ratspub"> Source code </a>
 
 {% endblock %}
 

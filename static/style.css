@@ -7,20 +7,20 @@
 
 
 a:link {
-    color:grey ;
+    color: #097DC9;
 }
 
 /* A link that has been visited */
 a:visited {
-    color: grey;
+    color: #097DC9;
 }
 
 /* A link that is hovered on */
 a:hover {
-    color: blue;
+    color: #097DC9;
 }
 
 /* A link that is selected */
 a:active {
-    color: blue;
+    color: #097DC9;
 }

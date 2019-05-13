@@ -14,6 +14,12 @@ app.config['SECRET_KEY'] = '#DtfrL98G5t1dC*4'
 def root():
     return render_template('index.html')
 
+@app.route("/about")
+def about():
+    return render_template('about.html')
+
+
+
 @app.route('/progress')
 def progress():
     # only 1-6 terms are allowed
