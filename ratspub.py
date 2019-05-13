@@ -102,17 +102,17 @@ addiction_d = {"reward":"reward|hedonic|incentive|intracranial self stimulation|
         }
 addiction=undic(addiction_d)
 
-drug_d = {"alcohol":"alcohol|alcoholism|alcoholic",
-        "nicotine":"smoking|nicotine|tobacco",
+drug_d = {"alcohol":"alcohol|alcoholism|alcoholic|alcoholics",
+        "nicotine":"smoking|nicotine|tobacco|smoker|smokers",
         "cocaine":"cocaine",
         "opioid":"opioid|opioids|fentanyl|oxycodone|oxycontin|heroin|morphine|methadone|buprenorphine|vicodin|hydrocodone|hycodan|kadian|percoset|hydromorphone|naloxone|codeine|suboxone|tramadol|kratom",
         "amphetamine":"methamphetamine|amphetamine|METH|AMPH",
-        "cannabinoid":"endocannabinoid|cannabinoids|endocannabinoids|marijuana|cannabidiol|cannabinoid|tetrahydrocannabinol|thc|thc 9|Oleoylethanolamide|palmitoylethanolamide|acylethanolamides"
+        "cannabinoid":"endocannabinoid|cannabinoids|cannabis|endocannabinoids|marijuana|cannabidiol|cannabinoid|tetrahydrocannabinol|thc|thc 9|Oleoylethanolamide|palmitoylethanolamide|acylethanolamides"
         }
 drug=undic(drug_d)
 
 brain_d ={"cortex":"cortex|prefrontal|pfc|mPFC|vmpfc|corticostriatal|cortico limbic|corticolimbic|prl|prelimbic|infralimbic|orbitofrontal|cingulate|cerebral|insular|insula",
-          "striatum":"striatum|STR|striatal|caudate|putamen|basal ganglia|globus pallidus",
+          "striatum":"striatum|STR|striatal|caudate|putamen|basal ganglia|globus pallidus|GPI",
           "accumbens":"accumbens|accumbal|shell|core|Nacc|NacSh|acbs|acbc",
           "hippocampus":"hippocampus|hippocampal|hipp|hip|ca1|ca3|dentate gyrus|subiculum|vhipp|dhpc|vhpc",
           "amygdala":"amygdala|cea|bla|amy",
