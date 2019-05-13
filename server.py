@@ -91,6 +91,32 @@ def sentences():
                out+= "<li> "+ text + " <a href=\"https://www.ncbi.nlm.nih.gov/pubmed/?term=" + pmid +"\" target=_new>PMID:"+pmid+"<br></a>"
     return render_template('sentences.html', sentences="<ol>"+out+"</ol><p>")
 
+## show the cytoscape graph for one gene from the top gene list
+@app.route("/showTopGene")
+def showTopGene():
+    topGene=request.args.get('topGene')
+    topGeneSentFile="gene_addiction_sentences_cnt.tab"
+    with open(topGeneSentFile, "r") as sents:
+        catCnt={}
+        for sent in sents:
+            (symb, cat0, cat1, pmid, sent)=sent.split("\t")
+            if (symb == topGene) :
+                if cat1 in catCnt.keys():
+                    catCnt[cat1]+=1
+                else:
+                    catCnt[cat1]=1
+    nodes= "{ data: { id: '" + topGene +  "', nodecolor: '" + "#2471A3" + "', fontweight:700, url:'/progress?query="+topGene+"' } },\n"
+    edges=str()
+    for key in catCnt.keys():
+        if ( key in drug_d.keys()):
+            nc=nodecolor["drug"]
+        else:
+            nc=nodecolor["addiction"]
+        nodes += "{ data: { id: '" + key +  "', nodecolor: '" + nc + "', nodetype: 'top150', url:'/shownode?node="+key+"' } },\n"
+        edgeID=topGeneSentFile+"|"+topGene+"|"+key
+        edges+="{ data: { id: '" + edgeID+ "', source: '" + topGene + "', target: '" + key + "', sentCnt: " + str(catCnt[key]) + ",  url:'/sentences?edgeID=" + edgeID + "' } },\n"
+    return render_template("cytoscape.html", elements=nodes+edges)
+
 @app.route("/shownode")
 def shownode():
     node=request.args.get('node')
@@ -139,11 +165,15 @@ def gene_gene():
     edges=str()
     for key in hitGenes.keys():
         #nodes += "{ data: { id: '" + key +  "', nodecolor: '" + nodecolor['top150'] + "', nodetype: 'top150', fontcolor:'#F2D7D5', url:'/shownode?nodetype=top150&node="+key+"' } },\n"
-        nodes += "{ data: { id: '" + key +  "', nodecolor: '" + nodecolor['top150'] + "', nodetype: 'top150', url:'/shownode?nodetype=top150&node="+key+"' } },\n"
+        nodes += "{ data: { id: '" + key +  "', nodecolor: '" + nodecolor['top150'] + "', nodetype: 'top150', url:'/showTopGene?topGene="+key+"' } },\n"
         edgeID=gg_file+"|"+query+"|"+key
         edges+="{ data: { id: '" + edgeID+ "', source: '" + query + "', target: '" + key + "', sentCnt: " + str(hitGenes[key]) + ",  url:'/sentences?edgeID=" + edgeID + "' } },\n"
     return render_template("cytoscape.html", elements=nodes+edges)
 
+## generate a page that lists all the top 150 addiction genes with links to cytoscape graph.
+@app.route("/allTopGenes")
+def top150genes():
+    return render_template("topAddictionGene.html")
 
 if __name__ == '__main__':
     app.run(debug=True)

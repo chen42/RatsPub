@@ -70,7 +70,6 @@ def gene_functional(gene):
     return(out)
 
 def generate_nodes(nodes_d, nodetype):
-    nodecolor={'function':"#A9CCE3", 'addiction': "#D7BDE2", 'drug': "#F9E79F", 'brain':"#A3E4D7"}
     # include all search terms even if there are no edges, just to show negative result 
     json0 =str()
     for node in nodes_d:
@@ -93,6 +92,7 @@ def generate_edges(data, filename):
         json0+="{ data: { id: '" + edgeID + "', source: '" + source + "', target: '" + target + "', sentCnt: " + str(edgeCnts[edgeID]) + ",  url:'/sentences?edgeID=" + edgeID + "' } },\n"
     return(json0)
 
+nodecolor={'function':"#A9CCE3", 'addiction': "#D7BDE2", 'drug': "#F9E79F", 'brain':"#A3E4D7"}
 addiction_d = {"reward":"reward|hedonic|incentive|intracranial self stimulation|ICSS|reinforcement|reinforcing|conditioned place preference|CPP|self administration|self administered|drug reinforced|operant|instrumental response",
         "aversion":"aversion|aversive|CTA|withdrawal|conditioned taste aversion",
         "relapse":"relapse|reinstatement|craving|drug seeking|seeking",
@@ -101,7 +101,6 @@ addiction_d = {"reward":"reward|hedonic|incentive|intracranial self stimulation|
         "intoxication":"intoxication|binge"
         }
 addiction=undic(addiction_d)
-
 drug_d = {"alcohol":"alcohol|alcoholism|alcoholic|alcoholics",
         "nicotine":"smoking|nicotine|tobacco|smoker|smokers",
         "cocaine":"cocaine",
@@ -110,7 +109,6 @@ drug_d = {"alcohol":"alcohol|alcoholism|alcoholic|alcoholics",
         "cannabinoid":"endocannabinoid|cannabinoids|cannabis|endocannabinoids|marijuana|cannabidiol|cannabinoid|tetrahydrocannabinol|thc|thc 9|Oleoylethanolamide|palmitoylethanolamide|acylethanolamides"
         }
 drug=undic(drug_d)
-
 brain_d ={"cortex":"cortex|prefrontal|pfc|mPFC|vmpfc|corticostriatal|cortico limbic|corticolimbic|prl|prelimbic|infralimbic|orbitofrontal|cingulate|cerebral|insular|insula",
           "striatum":"striatum|STR|striatal|caudate|putamen|basal ganglia|globus pallidus|GPI",
           "accumbens":"accumbens|accumbal|shell|core|Nacc|NacSh|acbs|acbc",
@@ -120,7 +118,6 @@ brain_d ={"cortex":"cortex|prefrontal|pfc|mPFC|vmpfc|corticostriatal|cortico lim
           }
 # brain region has too many short acronyms to just use the undic function, so search PubMed using the following 
 brain="cortex|accumbens|striatum|amygadala|hippocampus|tegmental|mesolimbic|infralimbic|prelimbic"
-
 function_d={"signalling":"signalling|signaling|phosphorylation|glycosylation",
             "transcription":"transcription|methylation|hypomethylation|hypermethylation|histone|ribosome",
             "neuroplasticity":"neuroplasticity|plasticity|long term potentiation|LTP|long term depression|LTD|synaptic|epsp|epsc|neurite|neurogenesis|boutons|mIPSC|IPSC|IPSP",
@@ -128,8 +125,6 @@ function_d={"signalling":"signalling|signaling|phosphorylation|glycosylation",
 #            "regulation":"increased|decreased|regulated|inhibited|stimulated",
             }
 function=undic(function_d)
-
-
 
 #https://htmlcolorcodes.com/
 n0=generate_nodes(function_d, 'function')
