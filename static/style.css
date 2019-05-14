@@ -5,6 +5,17 @@
 	left: 0px;
 }
 
+@media (min-width: 768px){
+  .container{
+    max-width:90%;
+  }
+}
+
+@media (min-width: 992px){
+  .container{
+    max-width:90%;
+  }
+}
 
 a:link {
     color: #097DC9;
@@ -24,3 +35,21 @@ a:hover {
 a:active {
     color: #097DC9;
 }
+
+* {
+  box-sizing: border-box;
+}
+
+.column {
+  float: left;
+}
+
+.left {
+  width: 80%;
+}
+
+.right {
+  width: 20%;
+}
+
+
