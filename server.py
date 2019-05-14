@@ -25,7 +25,7 @@ def progress():
     genes=genes.replace(",", " ")
     genes=genes.replace(";", " ")
     genes=genes.split()
-    if len(genes)>=60:
+    if len(genes)>=160:
         message="<span class='text-danger'>Up to five terms can be searched at a time</span>"
         return render_template('index.html', message=message)
     elif len(genes)==0:
@@ -45,15 +45,16 @@ def search():
     snt_file=session['path']+"_snt"
     cysdata=open(session['path']+"_cy","w+")
     sntdata=open(snt_file,"w+")
+    zeroLinkNode=open(session['path']+"_0link","w+")
     def generate(genes, tf_name):
         sentences=str()
         edges=str()
         nodes=default_nodes
         progress=0
         searchCnt=0
+        nodesToHide=str()
         for  gene in genes:
             gene=gene.replace("-"," ")
-            nodes+="{ data: { id: '" + gene +  "', nodecolor:'#E74C3C', fontweight:700, url:'/gene_gene?gene="+gene+"'} },\n"
             # report progress immediately
             progress+=percent
             yield "data:"+str(progress)+"\n\n"
@@ -77,7 +78,12 @@ def search():
             sent3=gene_category(gene, brain_d, brain_query_term, "brain")
             progress+=percent
             e3=generate_edges(sent3, tf_name)
-            edges+=e0+e1+e2+e3
+            geneEdges=e0+e1+e2+e3
+            if len(geneEdges) >1:
+                edges+=geneEdges
+                nodes+="{ data: { id: '" + gene +  "', nodecolor:'#E74C3C', fontweight:700, url:'/gene_gene?gene="+gene+"'} },\n"
+            else:
+                nodesToHide+=gene +  " "
             sentences+=sent0+sent1+sent2+sent3
             #save data before the last yield
             searchCnt+=1
@@ -87,14 +93,21 @@ def search():
                 sntdata.close()
                 cysdata.write(nodes+edges)
                 cysdata.close()
+                zeroLinkNode.write(nodesToHide)
+                zeroLinkNode.close()
             yield "data:"+str(progress)+"\n\n"
     return Response(generate(genes, snt_file), mimetype='text/event-stream')
 
 @app.route('/cytoscape')
 def cytoscape():
+    message2="This graph is interactive: <li>Click on a line to see the sentences <i>in a new window</i><li> Click on a gene to search its relations with top 150 addiction genes<li>Click on a keyword to see the terms included in the search <i> in a new window</i><p>"
     with open(session['path']+"_cy","r") as f:
         elements=f.read()
-        return render_template('cytoscape.html', elements=elements)
+    with open(session['path']+"_0link","r") as z:
+        zeroLink=z.read()
+        if (len(zeroLink)>0):
+            message2+="<span style=\"color:darkred;\">No result was found for these genes: " + zeroLink + "</span>"
+    return render_template('cytoscape.html', elements=elements, message="Gene vs Keywords", message2=message2)
 
 @app.route("/sentences")
 def sentences():
@@ -134,7 +147,8 @@ def showTopGene():
         nodes += "{ data: { id: '" + key +  "', nodecolor: '" + nc + "', nodetype: 'top150', url:'/shownode?node="+key+"' } },\n"
         edgeID=topGeneSentFile+"|"+topGene+"|"+key
         edges+="{ data: { id: '" + edgeID+ "', source: '" + topGene + "', target: '" + key + "', sentCnt: " + str(catCnt[key]) + ",  url:'/sentences?edgeID=" + edgeID + "' } },\n"
-    return render_template("cytoscape.html", elements=nodes+edges)
+    message2="<li><strong>"+topGene + "</strong> is one of the top addiction genes. <li> An archived search is shown. Click on the blue circle to update the results and include keywords for brain region and gene function. <strong> The update may take a long time to finish.</strong> "
+    return render_template("cytoscape.html", elements=nodes+edges, message="Top addiction genes", message2=message2)
 
 @app.route("/shownode")
 def shownode():
@@ -180,14 +194,14 @@ def gene_gene():
         gg.write(out)
         gg.close()
     nodecolor={'query':"#E74C3C", 'top150': "#ccd1d1"}
-    nodes= "{ data: { id: '" + query +  "', nodecolor: '" + nodecolor['query'] + "', nodetype: 'ggquery', fontweight:700,  url:'/shownode?nodetype=ggquery&node="+query+"' } },\n"
+    nodes= "{ data: { id: '" + query +  "', nodecolor: '" + nodecolor['query'] + "', nodetype: 'ggquery', fontweight:700} },\n"
     edges=str()
     for key in hitGenes.keys():
         #nodes += "{ data: { id: '" + key +  "', nodecolor: '" + nodecolor['top150'] + "', nodetype: 'top150', fontcolor:'#F2D7D5', url:'/shownode?nodetype=top150&node="+key+"' } },\n"
         nodes += "{ data: { id: '" + key +  "', nodecolor: '" + nodecolor['top150'] + "', nodetype: 'top150', url:'/showTopGene?topGene="+key+"' } },\n"
         edgeID=gg_file+"|"+query+"|"+key
         edges+="{ data: { id: '" + edgeID+ "', source: '" + query + "', target: '" + key + "', sentCnt: " + str(hitGenes[key]) + ",  url:'/sentences?edgeID=" + edgeID + "' } },\n"
-    return render_template("cytoscape.html", elements=nodes+edges)
+    return render_template("cytoscape.html", elements=nodes+edges, message="Gene vs top addiction genes", message2="<li>Top addiction genes are shown in grey. <li>Click on a grey gene will show an archived search. <li>Click on the lines will show gene-gene relations <i>in a new window</i>")
 
 ## generate a page that lists all the top 150 addiction genes with links to cytoscape graph.
 @app.route("/allTopGenes")
