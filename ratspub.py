@@ -30,6 +30,7 @@ def getSentences(query, gene):
 def gene_category(gene, cat_d, query, cat):
     #e.g. BDNF, addiction_d, undic(addiction_d) "addiction"
     q="\"(" + query.replace("|", " OR ")  + ") AND " + gene + "\""
+    print (">>>>>>>>>>" + q)
     sents=getSentences(q, gene)
     out=str()
     for sent in sents.split("\n"):
@@ -75,7 +76,7 @@ addiction=undic(addiction_d)
 drug_d = {"alcohol":"alcohol|alcoholism|alcoholic|alcoholics",
         "nicotine":"smoking|nicotine|tobacco|smoker|smokers",
         "cocaine":"cocaine",
-        "opioid":"opioid|opioids|fentanyl|oxycodone|oxycontin|heroin|morphine|methadone|buprenorphine|vicodin|hydrocodone|hycodan|kadian|percoset|hydromorphone|naloxone|codeine|suboxone|tramadol|kratom",
+        "opioid":"opioid|opioids|fentanyl|oxycodone|oxycontin|heroin|morphine|methadone|buprenorphine|vicodin|hydrocodone|hycodan|kadian|percoset|hydromorphone|naloxone|codeine|suboxone|tramadol|kratom|ultram",
         "amphetamine":"methamphetamine|amphetamine|METH|AMPH",
         "cannabinoid":"endocannabinoid|cannabinoids|cannabis|endocannabinoids|marijuana|cannabidiol|cannabinoid|tetrahydrocannabinol|thc|thc 9|Oleoylethanolamide|palmitoylethanolamide|acylethanolamides"
         }

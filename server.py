@@ -25,7 +25,7 @@ def progress():
     genes=genes.replace(",", " ")
     genes=genes.replace(";", " ")
     genes=genes.split()
-    if len(genes)>=6:
+    if len(genes)>=60:
         message="<span class='text-danger'>Up to five terms can be searched at a time</span>"
         return render_template('index.html', message=message)
     elif len(genes)==0:
@@ -50,13 +50,15 @@ def search():
         edges=str()
         nodes=default_nodes
         progress=0
+        searchCnt=0
         for  gene in genes:
             gene=gene.replace("-"," ")
             nodes+="{ data: { id: '" + gene +  "', nodecolor:'#E74C3C', fontweight:700, url:'/gene_gene?gene="+gene+"'} },\n"
             # report progress immediately
             progress+=percent
             yield "data:"+str(progress)+"\n\n"
-            addiction=undic(addiction_d)
+            #addiction terms must present with at least one drug
+            addiction=undic(addiction_d) +") AND ("+undic(drug_d)
             sent0=gene_category(gene, addiction_d, addiction, "addiction")
             e0=generate_edges(sent0, tf_name)
             #  
@@ -78,7 +80,8 @@ def search():
             edges+=e0+e1+e2+e3
             sentences+=sent0+sent1+sent2+sent3
             #save data before the last yield
-            if (progress>99):
+            searchCnt+=1
+            if (searchCnt==len(genes)):
                 progress=100
                 sntdata.write(sentences)
                 sntdata.close()
