@@ -1,0 +1,23 @@
+
+{% extends "layout.html" %}
+{% block content %}
+
+<h3> What does RatsPub do?</h3>
+
+<p>RatsPub searches PubMed to find abstracts containing genes of interest and a list of curated addiction-related keywords. The abstracts corresponding to these returned PMIDs are then retrieve from a <a href="https://dataguide.nlm.nih.gov/edirect/archive.html">local archive of the PubMed</a>. No limit on the date of publication is set. Each abstract is then broken down into sentences, which are then filtered by genes and keywords. 
+
+<p>These gene-keyword relationships are presented as an interactive <a href="https://js.cytoscape.org" >cytoscape</a> graph. 
+
+<p>Clicking  the links will bring up the corresponding sentences in a new browser window. Clicking the keyword nodes will bring up all the terms included. Clicking on the gene nodes will start a new search to find sentences containing that gene and the top 150 addiction genes. 
+
+<p> The top 150 addiction genes were obtained by searching All human genes against addiction related keywords. The archived results for these top addiction genes can be accessed via the <a href="/allTopGenes">Addiction Genes</a> link. 
+	
+<hr>
+<a href="https://github.com/chen42/ratspub"> Source code </a>
+
+
+{% endblock %}
+
+
+
+
