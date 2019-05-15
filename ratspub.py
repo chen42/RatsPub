@@ -30,7 +30,6 @@ def getSentences(query, gene):
 def gene_category(gene, cat_d, query, cat):
     #e.g. BDNF, addiction_d, undic(addiction_d) "addiction"
     q="\"(" + query.replace("|", " OR ")  + ") AND " + gene + "\""
-    print (">>>>>>>>>>" + q)
     sents=getSentences(q, gene)
     out=str()
     for sent in sents.split("\n"):
@@ -66,10 +65,12 @@ def generate_edges(data, filename):
 
 nodecolor={'function':"#A9CCE3", 'addiction': "#D7BDE2", 'drug': "#F9E79F", 'brain':"#A3E4D7"}
 addiction_d = {"reward":"reward|hedonic|incentive|intracranial self stimulation|ICSS|reinforcement|reinforcing|conditioned place preference|CPP|self administration|self administered|drug reinforced|operant|instrumental response",
-        "aversion":"aversion|aversive|CTA|withdrawal|conditioned taste aversion",
+        "aversion":"aversion|aversive|CTA|conditioned taste aversion",
+        "withdrawal":"withdrawal",
         "relapse":"relapse|reinstatement|craving|drug seeking|seeking",
         "sensitization":"sensitization",
-        "addiction":"addiction|dependence|addictive|drug abuse|punishment|compulsive|escalation",
+        "addiction":"addiction|addictive|drug abuse|punishment|compulsive|escalation",
+        "dependence":"dependence",
         "intoxication":"intoxication|binge"
         }
 addiction=undic(addiction_d)
@@ -85,11 +86,13 @@ brain_d ={"cortex":"cortex|prefrontal|pfc|mPFC|vmpfc|corticostriatal|cortico lim
           "striatum":"striatum|STR|striatal|caudate|putamen|basal ganglia|globus pallidus|GPI",
           "accumbens":"accumbens|accumbal|shell|core|Nacc|NacSh|acbs|acbc",
           "hippocampus":"hippocampus|hippocampal|hipp|hip|ca1|ca3|dentate gyrus|subiculum|vhipp|dhpc|vhpc",
-          "amygdala":"amygdala|cea|bla|amy",
-          "vta":"ventral tegmental|vta|pvta|mesolimbic|limbic|midbrain|mesoaccumbens"
+          "amygdala":"amygdala|cea|bla|amy|cna",
+          "VTA":"ventral tegmental|vta|pvta|mesolimbic|limbic|midbrain|mesoaccumbens|mesoaccumbal",
+          "habenula":"habenula|lhb|mhb",
+          "hypothalamus":"hypothalamus|hypothalamic|PVN|paraventricular nucleus"
           }
 # brain region has too many short acronyms to just use the undic function, so search PubMed using the following 
-brain_query_term="cortex|accumbens|striatum|amygadala|hippocampus|tegmental|mesolimbic|infralimbic|prelimbic"
+brain_query_term="cortex|accumbens|striatum|amygadala|hippocampus|tegmental|mesolimbic|infralimbic|prelimbic|habenula"
 function_d={"signalling":"signalling|signaling|phosphorylation|glycosylation",
             "transcription":"transcription|methylation|hypomethylation|hypermethylation|histone|ribosome",
             "neuroplasticity":"neuroplasticity|plasticity|long term potentiation|LTP|long term depression|LTD|synaptic|epsp|epsc|neurite|neurogenesis|boutons|mIPSC|IPSC|IPSP",
