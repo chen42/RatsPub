@@ -162,7 +162,7 @@ def gene_gene():
     query=request.args.get("gene")
     tmp_ggPMID=session['path']+"_ggPMID"
     os.system("esearch -db pubmed -query \"" +  query + "\" | efetch -format uid |sort >" + tmp_ggPMID)
-    abstracts=os.popen("comm -1 -2 top_150_addiction_genes_uniq.pmid " + tmp_ggPMID + " |fetch-pubmed -path /run/media/hao/PubMed/Archive/ | xtract -pattern PubmedArticle -element MedlineCitation/PMID,ArticleTitle,AbstractText|sed \"s/-/ /g\"").read()
+    abstracts=os.popen("comm -1 -2 top_150_addiction_genes_uniq.pmid " + tmp_ggPMID + " |fetch-pubmed -path "+pubmed_path+ " | xtract -pattern PubmedArticle -element MedlineCitation/PMID,ArticleTitle,AbstractText|sed \"s/-/ /g\"").read()
     os.system("rm "+tmp_ggPMID)
     topGenes=dict()
     out=str()
