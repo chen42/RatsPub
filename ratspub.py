@@ -2,8 +2,11 @@
 from nltk.tokenize import sent_tokenize
 import os
 import re
+import ratspub_keywords
 
-global function_d, brain_d, drug_d, addiction_d, brain_query_term
+global function_d, brain_d, drug_d, addiction_d, brain_query_term, pubmed_path
+
+pubmed_path="/media/hao/2d554499-6c5b-462d-85f3-5c49b25f4ac8/PubMed/Archive"
 
 ## turn dictionary (synonyms) to regular expression
 def undic(dic):
@@ -13,7 +16,7 @@ def findWholeWord(w):
     return re.compile(r'\b({0})\b'.format(w), flags=re.IGNORECASE).search
 
 def getSentences(query, gene):
-    abstracts = os.popen("esearch -db pubmed -query " +  query + " | efetch -format uid |fetch-pubmed -path /run/media/hao/PubMed/Archive/ | xtract -pattern PubmedArticle -element MedlineCitation/PMID,ArticleTitle,AbstractText|sed \"s/-/ /g\"").read()
+    abstracts = os.popen("esearch -db pubmed -query " +  query + " | efetch -format uid |fetch-pubmed -path "+ pubmed_path + " | xtract -pattern PubmedArticle -element MedlineCitation/PMID,ArticleTitle,AbstractText|sed \"s/-/ /g\"").read()
     out=str()
     for row in abstracts.split("\n"):
         tiab=row.split("\t")
@@ -63,44 +66,13 @@ def generate_edges(data, filename):
         json0+="{ data: { id: '" + edgeID + "', source: '" + source + "', target: '" + target + "', sentCnt: " + str(edgeCnts[edgeID]) + ",  url:'/sentences?edgeID=" + edgeID + "' } },\n"
     return(json0)
 
-nodecolor={'function':"#A9CCE3", 'addiction': "#D7BDE2", 'drug': "#F9E79F", 'brain':"#A3E4D7"}
-addiction_d = {"reward":"reward|hedonic|incentive|intracranial self stimulation|ICSS|reinforcement|reinforcing|conditioned place preference|CPP|self administration|self administered|drug reinforced|operant|instrumental response",
-        "aversion":"aversion|aversive|CTA|conditioned taste aversion",
-        "withdrawal":"withdrawal",
-        "relapse":"relapse|reinstatement|craving|drug seeking|seeking",
-        "sensitization":"sensitization",
-        "addiction":"addiction|addictive|drug abuse|punishment|compulsive|escalation",
-        "dependence":"dependence",
-        "intoxication":"intoxication|binge"
-        }
-addiction=undic(addiction_d)
-drug_d = {"alcohol":"alcohol|alcoholism|alcoholic|alcoholics",
-        "nicotine":"smoking|nicotine|tobacco|smoker|smokers",
-        "cocaine":"cocaine",
-        "opioid":"opioid|opioids|fentanyl|oxycodone|oxycontin|heroin|morphine|methadone|buprenorphine|vicodin|hydrocodone|hycodan|kadian|percoset|hydromorphone|naloxone|codeine|suboxone|tramadol|kratom|ultram",
-        "amphetamine":"methamphetamine|amphetamine|METH|AMPH",
-        "cannabinoid":"endocannabinoid|cannabinoids|cannabis|endocannabinoids|marijuana|cannabidiol|cannabinoid|tetrahydrocannabinol|thc|thc 9|Oleoylethanolamide|palmitoylethanolamide|acylethanolamides"
-        }
-drug=undic(drug_d)
-brain_d ={"cortex":"cortex|prefrontal|pfc|mPFC|vmpfc|corticostriatal|cortico limbic|corticolimbic|prl|prelimbic|infralimbic|orbitofrontal|cingulate|cerebral|insular|insula",
-          "striatum":"striatum|STR|striatal|caudate|putamen|basal ganglia|globus pallidus|GPI",
-          "accumbens":"accumbens|accumbal|shell|core|Nacc|NacSh|acbs|acbc",
-          "hippocampus":"hippocampus|hippocampal|hipp|hip|ca1|ca3|dentate gyrus|subiculum|vhipp|dhpc|vhpc",
-          "amygdala":"amygdala|cea|bla|amy|cna",
-          "VTA":"ventral tegmental|vta|pvta|mesolimbic|limbic|midbrain|mesoaccumbens|mesoaccumbal",
-          "habenula":"habenula|lhb|mhb",
-          "hypothalamus":"hypothalamus|hypothalamic|PVN|paraventricular nucleus"
-          }
 # brain region has too many short acronyms to just use the undic function, so search PubMed using the following 
 brain_query_term="cortex|accumbens|striatum|amygadala|hippocampus|tegmental|mesolimbic|infralimbic|prelimbic|habenula"
-function_d={"signalling":"signalling|signaling|phosphorylation|glycosylation",
-            "transcription":"transcription|methylation|hypomethylation|hypermethylation|histone|ribosome",
-            "neuroplasticity":"neuroplasticity|plasticity|long term potentiation|LTP|long term depression|LTD|synaptic|epsp|epsc|neurite|neurogenesis|boutons|mIPSC|IPSC|IPSP",
-            "neurotransmission": "neurotransmission|neuropeptides|neuropeptide|glutamate|glutamatergic|GABA|GABAergic|dopamine|dopaminergic|DAergic|cholinergic|nicotinic|muscarinic|serotonergic|serotonin|5 ht|acetylcholine",
-#            "regulation":"increased|decreased|regulated|inhibited|stimulated",
-            }
 function=undic(function_d)
+addiction=undic(addiction_d)
+drug=undic(drug_d)
 
+nodecolor={'function':"#A9CCE3", 'addiction': "#D7BDE2", 'drug': "#F9E79F", 'brain':"#A3E4D7"}
 #https://htmlcolorcodes.com/
 n0=generate_nodes(function_d, 'function')
 n1=generate_nodes(addiction_d, 'addiction')
