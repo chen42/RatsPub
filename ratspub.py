@@ -2,11 +2,10 @@
 from nltk.tokenize import sent_tokenize
 import os
 import re
-import ratspub_keywords
+from ratspub_keywords import *
 
 global function_d, brain_d, drug_d, addiction_d, brain_query_term, pubmed_path
 
-pubmed_path="/media/hao/2d554499-6c5b-462d-85f3-5c49b25f4ac8/PubMed/Archive"
 
 ## turn dictionary (synonyms) to regular expression
 def undic(dic):
@@ -79,3 +78,11 @@ n1=generate_nodes(addiction_d, 'addiction')
 n2=generate_nodes(drug_d, 'drug')
 n3=generate_nodes(brain_d, 'brain')
 default_nodes=n0+n1+n2+n3
+
+
+host= os.popen('hostname').read().strip()
+if host=="x1":
+    pubmed_path="/run/media/hao/PubMed/Archive/"
+elif host=="hchen3":
+    pubmed_path="/media/hao/2d554499-6c5b-462d-85f3-5c49b25f4ac8/PubMed/Archive"
+
