@@ -127,7 +127,7 @@ def sentences():
 @app.route("/showTopGene")
 def showTopGene():
     topGene=request.args.get('topGene')
-    topGeneSentFile="gene_addiction_sentences_cnt.tab"
+    topGeneSentFile="gene_addiction_sentences.tab"
     with open(topGeneSentFile, "r") as sents:
         catCnt={}
         for sent in sents:

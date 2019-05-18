@@ -39,6 +39,7 @@ if len(sys.argv)==2:
     input_f=sys.argv[1]
 else:
     input_f="./ncbi_gene_symb_syno_name_txid9606.txt"
+    input_f="./ncbi_gene_symb_syno_name_txid9606_p2.txt"
 
 addiction=undic(addiction_d)
 drug=undic(drug_d)
@@ -72,6 +73,8 @@ with open (input_f, "r") as f:
         # tab is added if there are abstracts counts
         if "\t" in line:
             (gene, count)=line.split("\t")
+            if int(count)<100:
+               rerun=1
         else:
             gene=line.strip()
         # remove synonyms with only two letters
@@ -92,4 +95,8 @@ with open (input_f, "r") as f:
         # only save the non_zero results
         if (int(count)>0):
             out.write(gene+"\t"+count)
+
+sorted_f=out_f.replace(".txt","_sorted.txt")
+os.system("sort -k2 -t$'\t' -rn " + out_f + " > " + sorted_f )
+
 
