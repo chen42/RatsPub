@@ -15,7 +15,7 @@ def collectTerms():
         for one in top:
             cnt+=1
             (symb, alias)=one.split("\t")
-            q+="|"+alias.strip()
+            q+="|"+symb+"|"+alias.strip()
             if (cnt==5):
                 print ("\n")
                 q=q[1:]
