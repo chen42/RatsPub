@@ -21,7 +21,7 @@ brain_d ={"cortex":"cortex|prefrontal|pfc|mPFC|vmpfc|corticostriatal|cortico lim
           "amygdala":"amygdala|cea|bla|amy|cna",
           "VTA":"ventral tegmental|vta|pvta|mesolimbic|limbic|midbrain|mesoaccumbens|mesoaccumbal",
           "habenula":"habenula|lhb|mhb",
-          "hypothalamus":"hypothalamus|hypothalamic|PVN|paraventricular nucleus"
+          "hypothalamus":"hypothalamus|hypothalamic|PVN|paraventricular nucleus|LHA"
           }
 # brain region has too many short acronyms to just use the undic function, so search PubMed using the following 
 brain_query_term="cortex|accumbens|striatum|amygadala|hippocampus|tegmental|mesolimbic|infralimbic|prelimbic|habenula"

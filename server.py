@@ -100,7 +100,7 @@ def search():
 
 @app.route('/cytoscape')
 def cytoscape():
-    message2="This graph is interactive: <li>Click on a line to see the sentences <i>in a new window</i><li> Click on a gene to search its relations with top 150 addiction genes<li>Click on a keyword to see the terms included in the search <i> in a new window</i><p>"
+    message2="This graph is interactive: <li>Click on a line to see the sentences <i>in a new window</i><li> Click on a gene to search its relations with top 200 addiction genes<li>Click on a keyword to see the terms included in the search <i> in a new window</i><p>"
     with open(session['path']+"_cy","r") as f:
         elements=f.read()
     with open(session['path']+"_0link","r") as z:
@@ -127,7 +127,7 @@ def sentences():
 @app.route("/showTopGene")
 def showTopGene():
     topGene=request.args.get('topGene')
-    topGeneSentFile="gene_addiction_sentences.tab"
+    topGeneSentFile="topGene_addiction_sentences.tab"
     with open(topGeneSentFile, "r") as sents:
         catCnt={}
         for sent in sents:
@@ -162,15 +162,15 @@ def gene_gene():
     query=request.args.get("gene")
     tmp_ggPMID=session['path']+"_ggPMID"
     os.system("esearch -db pubmed -query \"" +  query + "\" | efetch -format uid |sort >" + tmp_ggPMID)
-    abstracts=os.popen("comm -1 -2 top_150_addiction_genes_uniq.pmid " + tmp_ggPMID + " |fetch-pubmed -path "+pubmed_path+ " | xtract -pattern PubmedArticle -element MedlineCitation/PMID,ArticleTitle,AbstractText|sed \"s/-/ /g\"").read()
+    abstracts=os.popen("comm -1 -2 topGene_uniq.pmid " + tmp_ggPMID + " |fetch-pubmed -path "+pubmed_path+ " | xtract -pattern PubmedArticle -element MedlineCitation/PMID,ArticleTitle,AbstractText|sed \"s/-/ /g\"").read()
     os.system("rm "+tmp_ggPMID)
     topGenes=dict()
     out=str()
     hitGenes=dict()
-    with open("./top_150_genes_symb_alias.txt", "r") as top_f:
+    with open("./topGene_symb_alias.txt", "r") as top_f:
         for line in top_f:
             (symb, alias)=line.strip().split("\t")
-            topGenes[symb]=alias
+            topGenes[symb]=alias.replace("; ","|")
     for row in abstracts.split("\n"):
         tiab=row.split("\t")
         pmid = tiab.pop(0)
@@ -181,9 +181,10 @@ def gene_gene():
             if findWholeWord(query)(sent):
                 sent=re.sub(r'\b(%s)\b' % query, r'<strong>\1</strong>', sent, flags=re.I)
                 for symb in topGenes:
-                    if findWholeWord(topGenes[symb])(sent) :
+                    allNames=symb+"|"+topGenes[symb]
+                    if findWholeWord(allNames)(sent) :
                         sent=sent.replace("<b>","").replace("</b>","")
-                        sent=re.sub(r'\b(%s)\b' % topGenes[symb], r'<b>\1</b>', sent, flags=re.I)
+                        sent=re.sub(r'\b(%s)\b' % allNames, r'<b>\1</b>', sent, flags=re.I)
                         out+=query+"\t"+"gene\t" + symb+"\t"+pmid+"\t"+sent+"\n"
                         if symb in hitGenes.keys():
                             hitGenes[symb]+=1
@@ -193,15 +194,16 @@ def gene_gene():
     with open(gg_file, "w+") as gg:
         gg.write(out)
         gg.close()
-    nodecolor={'query':"#E74C3C", 'top150': "#ccd1d1"}
-    nodes= "{ data: { id: '" + query +  "', nodecolor: '" + nodecolor['query'] + "', nodetype: 'ggquery', fontweight:700} },\n"
-    edges=str()
+    results="<h4>Gene vs top addiction genes</h4> Click on the number of sentences will show those sentences. Click on the top addiction gene will show an archived search for that gene.<hr>"
+    topGeneHits={}
     for key in hitGenes.keys():
-        #nodes += "{ data: { id: '" + key +  "', nodecolor: '" + nodecolor['top150'] + "', nodetype: 'top150', fontcolor:'#F2D7D5', url:'/shownode?nodetype=top150&node="+key+"' } },\n"
-        nodes += "{ data: { id: '" + key +  "', nodecolor: '" + nodecolor['top150'] + "', nodetype: 'top150', url:'/showTopGene?topGene="+key+"' } },\n"
-        edgeID=gg_file+"|"+query+"|"+key
-        edges+="{ data: { id: '" + edgeID+ "', source: '" + query + "', target: '" + key + "', sentCnt: " + str(hitGenes[key]) + ",  url:'/sentences?edgeID=" + edgeID + "' } },\n"
-    return render_template("cytoscape.html", elements=nodes+edges, message="Gene vs top addiction genes", message2="<li>Top addiction genes are shown in grey. <li>Click on a grey gene will show an archived search. <li>Click on the lines will show gene-gene relations <i>in a new window</i>")
+        url=gg_file+"|"+query+"|"+key
+        topGeneHits["<li>"+query+" and <a href=/showTopGene?topGene="+key+" target=_New>"+key+"</a> :  <a href=/sentences?edgeID=" + url+ " target=_new>" +  str(hitGenes[key]) + " sentences.</a> \n"]=hitGenes[key]
+    #yyps = [(k, d[k]) for k in sorted(d, key=d.get, reverse=True)]
+    topSorted = [(k, topGeneHits[k]) for k in sorted(topGeneHits, key=topGeneHits.get, reverse=True)]
+    for k,v in topSorted:
+        results+=k
+    return render_template("sentences.html", sentences=results)
 
 ## generate a page that lists all the top 150 addiction genes with links to cytoscape graph.
 @app.route("/allTopGenes")
