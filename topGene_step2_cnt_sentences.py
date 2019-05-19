@@ -1,5 +1,5 @@
 #!/bin/env python3 
-import os
+import os, sys
 import re
 import time
 from nltk.tokenize import sent_tokenize
@@ -42,11 +42,18 @@ addiction=undic(addiction_d)
 drug=undic(drug_d)
 
 
-out=open("gene_addiction_sentences.tab", "w+")
+out=open("topGene_addiction_sentences.tab", "w+")
 cnt=0
-with open ("./ncbi_gene_symb_syno_name_txid9606_absCnt_sorted_absCnt_sorted_absCnt_sorted.txt", "r") as f:
+
+if len(sys.argv) != 2:
+    print ("Please provide a sorted gene count file at the command line")
+    sys.exit()
+
+sorted_file=sys.argv[1] #  ncbi_gene_symb_syno_name_txid9606_absCnt_sorted_absCnt_sorted_absCnt_sorted_absCnt_sorted.txt
+with open (sorted_file, "r") as f:
     for line in f:
         (genes, abstractCount)=line.strip().split("\t")
+        genes=genes.replace("-","\ ")
         if int(abstractCount)>20:
             symb=genes.split("|")[0]
             print(symb+"-->"+genes)
@@ -55,5 +62,4 @@ with open ("./ncbi_gene_symb_syno_name_txid9606_absCnt_sorted_absCnt_sorted_absC
             out.write(sentences)
 out.close()
 
-os.system("cut -f 1,4 gene_addiction_sentences.tab |uniq  |cut -f 1 |uniq -c |sort -rn > topGeneAbstractCount.tab")
-
+os.system("cut -f 1,4 topGene_addiction_sentences.tab  |uniq |cut -f 1 |sort |uniq -c |sort -rn > topGeneAbstractCount.tab")

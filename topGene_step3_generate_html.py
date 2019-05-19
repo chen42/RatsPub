@@ -1,14 +1,21 @@
 import re
+import sys
 
 ## generate the html page for the top genes
 
 ## put gene names and alias in a dictionary
+#ncbi_gene_symb_syno_name_txid9606_absCnt_sorted_absCnt_sorted_absCnt_absCnt_sorted.txt
+if (len(sys.argv) != 2):
+    print ("please provide the name of a sorted gene abstract count file")
+    sys.exit()
+
 geneNames={}
-with open ("./ncbi_gene_symb_syno_name_txid9606_absCnt_sorted_absCnt_sorted.txt","r") as f:
+with open (sys.argv[1],"r") as f:
     for line in f:
         (genes, count)=line.strip().split("\t")
         gene=genes.split("|")
-        geneNames[gene[0]]=genes.strip()
+        names=re.sub(r'^.*?\|', "", genes)
+        geneNames[gene[0]]=names.strip().replace("|", "; ")
 
 out=str()
 html=str()
@@ -20,8 +27,8 @@ with open("./topGeneAbstractCount.tab" ,"r") as gc:
         print (line)
         pmid_cnt, symb=line.strip().split()
         out+= symb+"\t"+geneNames[symb]+"\n"
-        html+="<li><a href=\"/showTopGene?topGene="+symb+"\">"+symb+"</a><br>\n"
-        if cnt==500:
+        html+="<li><a href=\"/showTopGene?topGene="+symb+"\">"+symb+"</a> <span style=\"font-size:small; color:grey\">("+geneNames[symb]+")</span><br>\n"
+        if cnt==200:
             break
 
 with open("topGene_symb_alias.txt", "w+")  as tg:

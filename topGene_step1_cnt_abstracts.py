@@ -31,7 +31,6 @@ def saveStopWord(w):
         swf.write(w+"\n")
     return
 
-
 # either start with ncbi_gene_symb_syno_name_txid9606 for fresh new counts
 # or recount the results after adding additional stopwords
 
@@ -39,7 +38,6 @@ if len(sys.argv)==2:
     input_f=sys.argv[1]
 else:
     input_f="./ncbi_gene_symb_syno_name_txid9606.txt"
-    input_f="./ncbi_gene_symb_syno_name_txid9606_p2.txt"
 
 addiction=undic(addiction_d)
 drug=undic(drug_d)
@@ -53,50 +51,57 @@ with open (stopword_f, "r") as swf:
 
 with open (input_f, "r") as f:
     for line in f:
-        rerun=0
-        count=-1
+        do_search=0
         inputline=line
+        line=line.replace("-","\ ")
+        # remove the annotated stopword
         if "'" in line:
+            do_search=1
             words=line.split("|")
             line=str()
             for word in words:
                 # ' is used to mark/annotate a word is a stop word in the results
+                # remove the ' mark 
                 if "'" in word:
                     word=word.replace("'","")
                     stopWords.append(word)
                     saveStopWord(word)
-                    rerun=1
-                # remove the ' mark 
                 line+="|"+word
             line=line[1:]
         line=removeStopWords(line)
         # tab is added if there are abstracts counts
         if "\t" in line:
             (gene, count)=line.split("\t")
-            if int(count)<100:
-               rerun=1
+            # rerun if count is low, these are less annotated
+        #    if int(count)<50:
+        #        do_search=1
         else:
+            #no count, 
             gene=line.strip()
-        # remove synonyms with only two letters
-        if "|" in gene:
-            synos=gene.split("|")
-            gene=str()
-            for syno in synos:
-                if len(syno)>2:
-                    gene+="|"+syno
-            gene=gene[1:]
-        gene_q=gene.replace("|", "\"[tiab] OR \"")
-        gene_q+="[tiab]"
-        if rerun==1 or count== -1 :
+            do_search=1
+        if do_search==1:
+            # remove synonyms with only two letters
+            if "|" in gene:
+                synos=gene.split("|")
+                # keep the gene name regardless number of characters
+                gene=synos[0]
+                #print ("gene: "+gene + " synos -->" + str(synos[1:]))
+                for syno in synos[1:]:
+                    #synonyms must be at least 3 characters
+                    if len(syno)>3:
+                        gene+="|"+syno
+            gene_q=gene.replace("|", "\"[tiab] OR \"")
+            gene_q+="[tiab]"
             count=gene_addiction_cnt(gene_q)
-        print("original line->\t"+inputline.strip())
-        print("stopword rmed->\t"+line.strip())
-        print("final  result->\t"+gene+"\t"+count)
-        # only save the non_zero results
-        if (int(count)>0):
+            print("original line->\t"+inputline.strip())
+            print("stopword rmed->\t"+line.strip())
+            print("final  result->\t"+gene+"\t"+count)
             out.write(gene+"\t"+count)
+        else:
+            print("original resl->\t"+inputline.strip())
+            out.write(inputline)
 
-sorted_f=out_f.replace(".txt","_sorted.txt")
-os.system("sort -k2 -t$'\t' -rn " + out_f + " > " + sorted_f )
+sorted_f=output_f.replace(".txt","_sorted.txt")
+os.system("sort -k2 -t$'\t' -rn " + output_f + " > " + sorted_f )
 
 
