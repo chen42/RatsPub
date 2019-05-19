@@ -194,16 +194,19 @@ def gene_gene():
     with open(gg_file, "w+") as gg:
         gg.write(out)
         gg.close()
-    results="<h4>Gene vs top addiction genes</h4> Click on the number of sentences will show those sentences. Click on the <span style=\"background-color:#FcF3cf\">top addiction genes</span> will show an archived search for that gene.<hr>"
+    results="<h4>"+query+" vs top addiction genes</h4> Click on the number of sentences will show those sentences. Click on the <span style=\"background-color:#FcF3cf\">top addiction genes</span> will show an archived search for that gene.<hr>"
     topGeneHits={}
     for key in hitGenes.keys():
         url=gg_file+"|"+query+"|"+key
-        topGeneHits["<li>"+query+" and <a href=/showTopGene?topGene="+key+" target=_gene><span style=\"background-color:#FcF3cf\">"+key+"</span></a> :  <a href=/sentences?edgeID=" + url+ " target=_new>" +  str(hitGenes[key]) + " sentences.</a> \n"]=hitGenes[key]
-    #yyps = [(k, d[k]) for k in sorted(d, key=d.get, reverse=True)]
+        if hitGenes[key]==1:
+            sentword="sentence"
+        else:
+            sentword="sentences"
+        topGeneHits[ "<li> <a href=/sentences?edgeID=" + url+ " target=_new>" + "Show " + str(hitGenes[key]) + " " + sentword +" </a> about "+query+" and <a href=/showTopGene?topGene="+key+" target=_gene><span style=\"background-color:#FcF3cf\">"+key+"</span></a>" ]=hitGenes[key]
     topSorted = [(k, topGeneHits[k]) for k in sorted(topGeneHits, key=topGeneHits.get, reverse=True)]
     for k,v in topSorted:
         results+=k
-    return render_template("sentences.html", sentences=results)
+    return render_template("sentences.html", sentences=results+"<p><br>")
 
 ## generate a page that lists all the top 150 addiction genes with links to cytoscape graph.
 @app.route("/allTopGenes")
