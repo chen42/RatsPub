@@ -25,8 +25,8 @@ def progress():
     genes=genes.replace(",", " ")
     genes=genes.replace(";", " ")
     genes=genes.split()
-    if len(genes)>=160:
-        message="<span class='text-danger'>Up to five terms can be searched at a time</span>"
+    if len(genes)>=100:
+        message="<span class='text-danger'>Up to 100 terms can be searched at a time</span>"
         return render_template('index.html', message=message)
     elif len(genes)==0:
         message="<span class='text-danger'>Please enter a search term </span>"
@@ -100,14 +100,14 @@ def search():
 
 @app.route('/cytoscape')
 def cytoscape():
-    message2="This graph is interactive: <li>Click on a line to see the sentences <i>in a new window</i><li> Click on a gene to search its relations with top 200 addiction genes<li>Click on a keyword to see the terms included in the search <i> in a new window</i><p>"
+    message2="<h4> Gene vs Keywords</h4>This graph is interactive: <li>Click on a line to see the sentences <i>in a new window</i><li> Click on a gene to search its relations with top 200 addiction genes<li>Click on a keyword to see the terms included in the search <i> in a new window</i><p>"
     with open(session['path']+"_cy","r") as f:
         elements=f.read()
     with open(session['path']+"_0link","r") as z:
         zeroLink=z.read()
         if (len(zeroLink)>0):
             message2+="<span style=\"color:darkred;\">No result was found for these genes: " + zeroLink + "</span>"
-    return render_template('cytoscape.html', elements=elements, message="Gene vs Keywords", message2=message2)
+    return render_template('cytoscape.html', elements=elements, message2=message2)
 
 @app.route("/sentences")
 def sentences():
@@ -194,11 +194,11 @@ def gene_gene():
     with open(gg_file, "w+") as gg:
         gg.write(out)
         gg.close()
-    results="<h4>Gene vs top addiction genes</h4> Click on the number of sentences will show those sentences. Click on the top addiction gene will show an archived search for that gene.<hr>"
+    results="<h4>Gene vs top addiction genes</h4> Click on the number of sentences will show those sentences. Click on the <span style=\"background-color:#FcF3cf\">top addiction genes</span> will show an archived search for that gene.<hr>"
     topGeneHits={}
     for key in hitGenes.keys():
         url=gg_file+"|"+query+"|"+key
-        topGeneHits["<li>"+query+" and <a href=/showTopGene?topGene="+key+" target=_New>"+key+"</a> :  <a href=/sentences?edgeID=" + url+ " target=_new>" +  str(hitGenes[key]) + " sentences.</a> \n"]=hitGenes[key]
+        topGeneHits["<li>"+query+" and <a href=/showTopGene?topGene="+key+" target=_gene><span style=\"background-color:#FcF3cf\">"+key+"</span></a> :  <a href=/sentences?edgeID=" + url+ " target=_new>" +  str(hitGenes[key]) + " sentences.</a> \n"]=hitGenes[key]
     #yyps = [(k, d[k]) for k in sorted(d, key=d.get, reverse=True)]
     topSorted = [(k, topGeneHits[k]) for k in sorted(topGeneHits, key=topGeneHits.get, reverse=True)]
     for k,v in topSorted:
