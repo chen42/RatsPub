@@ -115,4 +115,5 @@ if host=="x1":
     pubmed_path="/run/media/hao/PubMed/Archive/"
 elif host=="hchen3":
     pubmed_path="/media/hao/2d554499-6c5b-462d-85f3-5c49b25f4ac8/PubMed/Archive"
-
+elif host=="penguin2":
+    pubmed_path="/export2/PubMed/Archive"
