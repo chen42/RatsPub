@@ -78,7 +78,9 @@ def search():
             sent3=gene_category(gene, brain_d, brain_query_term, "brain")
             progress+=percent
             e3=generate_edges(sent3, tf_name)
-            geneEdges=e0+e1+e2+e3
+            # gwas
+            e4=searchArchived('gwas', gene)
+            geneEdges=e0+e1+e2+e3+e4
             if len(geneEdges) >1:
                 edges+=geneEdges
                 nodes+="{ data: { id: '" + gene +  "', nodecolor:'#E74C3C', fontweight:700, url:'/gene_gene?gene="+gene+"'} },\n"
@@ -119,36 +121,17 @@ def sentences():
     for sent in all_sents.split("\n"):
         if len(sent.strip())!=0:
            (gene,nouse,cat, pmid, text)=sent.split("\t")
-           if (gene == gene0 and cat == cat0) :
+           if (gene.upper() == gene0.upper() and cat.upper() == cat0.upper()) :
                out+= "<li> "+ text + " <a href=\"https://www.ncbi.nlm.nih.gov/pubmed/?term=" + pmid +"\" target=_new>PMID:"+pmid+"<br></a>"
     return render_template('sentences.html', sentences="<ol>"+out+"</ol><p>")
 
 ## show the cytoscape graph for one gene from the top gene list
 @app.route("/showTopGene")
 def showTopGene():
-    topGene=request.args.get('topGene')
-    topGeneSentFile="topGene_addiction_sentences.tab"
-    with open(topGeneSentFile, "r") as sents:
-        catCnt={}
-        for sent in sents:
-            (symb, cat0, cat1, pmid, sent)=sent.split("\t")
-            if (symb == topGene) :
-                if cat1 in catCnt.keys():
-                    catCnt[cat1]+=1
-                else:
-                    catCnt[cat1]=1
-    nodes= "{ data: { id: '" + topGene +  "', nodecolor: '" + "#2471A3" + "', fontweight:700, url:'/progress?query="+topGene+"' } },\n"
-    edges=str()
-    for key in catCnt.keys():
-        if ( key in drug_d.keys()):
-            nc=nodecolor["drug"]
-        else:
-            nc=nodecolor["addiction"]
-        nodes += "{ data: { id: '" + key +  "', nodecolor: '" + nc + "', nodetype: 'top150', url:'/shownode?node="+key+"' } },\n"
-        edgeID=topGeneSentFile+"|"+topGene+"|"+key
-        edges+="{ data: { id: '" + edgeID+ "', source: '" + topGene + "', target: '" + key + "', sentCnt: " + str(catCnt[key]) + ",  url:'/sentences?edgeID=" + edgeID + "' } },\n"
-    message2="<li><strong>"+topGene + "</strong> is one of the top addiction genes. <li> An archived search is shown. Click on the blue circle to update the results and include keywords for brain region and gene function. <strong> The update may take a long time to finish.</strong> "
-    return render_template("cytoscape.html", elements=nodes+edges, message="Top addiction genes", message2=message2)
+    query=request.args.get('topGene')
+    nodesEdges=searchArchived('topGene',query)
+    message2="<li><strong>"+query + "</strong> is one of the top addiction genes. <li> An archived search is shown. Click on the blue circle to update the results and include keywords for brain region and gene function. <strong> The update may take a long time to finish.</strong> "
+    return render_template("cytoscape.html", elements=nodesEdges, message="Top addiction genes", message2=message2)
 
 @app.route("/shownode")
 def shownode():

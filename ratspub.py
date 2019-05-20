@@ -65,13 +65,43 @@ def generate_edges(data, filename):
         json0+="{ data: { id: '" + edgeID + "', source: '" + source + "', target: '" + target + "', sentCnt: " + str(edgeCnts[edgeID]) + ",  url:'/sentences?edgeID=" + edgeID + "' } },\n"
     return(json0)
 
+def searchArchived(sets, query):
+    if sets=='topGene':
+        dataFile="topGene_addiction_sentences.tab"
+        nodes= "{ data: { id: '" + query +  "', nodecolor: '" + "#2471A3" + "', fontweight:700, url:'/progress?query="+query+"' } },\n"
+    elif sets=='gwas':
+        dataFile="gwas_addiction.tab"
+        nodes=str()
+    with open(dataFile, "r") as sents:
+        catCnt={}
+        for sent in sents:
+            (symb, cat0, cat1, pmid, sent)=sent.split("\t")
+            if (symb.upper() == query.upper()) :
+                if cat1 in catCnt.keys():
+                    catCnt[cat1]+=1
+                else:
+                    catCnt[cat1]=1
+    nodes= "{ data: { id: '" + query +  "', nodecolor: '" + "#2471A3" + "', fontweight:700, url:'/progress?query="+query+"' } },\n"
+    edges=str()
+    for key in catCnt.keys():
+        if sets=='gwas':
+            nc=nodecolor["gwas"]
+        elif key in drug_d.keys():
+            nc=nodecolor["drug"]
+        else:
+            nc=nodecolor["addiction"]
+        nodes += "{ data: { id: '" + key +  "', nodecolor: '" + nc + "', nodetype: 'top150', url:'/shownode?node="+key+"' } },\n"
+        edgeID=dataFile+"|"+query+"|"+key
+        edges+="{ data: { id: '" + edgeID+ "', source: '" + query + "', target: '" + key + "', sentCnt: " + str(catCnt[key]) + ",  url:'/sentences?edgeID=" + edgeID + "' } },\n"
+    return(nodes+edges)
+
 # brain region has too many short acronyms to just use the undic function, so search PubMed using the following 
 brain_query_term="cortex|accumbens|striatum|amygadala|hippocampus|tegmental|mesolimbic|infralimbic|prelimbic|habenula"
 function=undic(function_d)
 addiction=undic(addiction_d)
 drug=undic(drug_d)
 
-nodecolor={'function':"#A9CCE3", 'addiction': "#D7BDE2", 'drug': "#F9E79F", 'brain':"#A3E4D7"}
+nodecolor={'function':"#A9CCE3", 'addiction': "#D7BDE2", 'drug': "#F9E79F", 'brain':"#A3E4D7", 'gwas':"#AEB6BF"}
 #https://htmlcolorcodes.com/
 n0=generate_nodes(function_d, 'function')
 n1=generate_nodes(addiction_d, 'addiction')
