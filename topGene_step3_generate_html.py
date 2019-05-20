@@ -40,10 +40,10 @@ htmlout='''
 {% extends "layout.html" %}
 {% block content %}
 
-<h3> Top addiction related genes </h3>
+<h4> Top addiction related genes </h4>
 
 <br>
-These genes are ranked by the number of PubMed abstracts that contain the name of the gene and one or more addiction related keyword.
+These genes are ranked by the number of PubMed abstracts that contain the name of the gene and one or more addiction related keyword. Alias were obtained from NCBI gene database and have been curated to remove most, but not all, false matches.
 <hr>
 
 <ol>''' + html  + '''
