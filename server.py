@@ -102,7 +102,7 @@ def search():
 
 @app.route('/cytoscape')
 def cytoscape():
-    message2="<h4> Gene vs Keywords</h4>This graph is interactive: <li>Click on a line to see the sentences <i>in a new window</i><li> Click on a gene to search its relations with top 200 addiction genes<li>Click on a keyword to see the terms included in the search <i> in a new window</i><p>"
+    message2="<b> This  <i>Genes vs Keywords</i> graph is interactive: </b><li>Click on a line to see the indicated number of sentences <li> Click on a gene to search its relations with top 200 addiction genes<li>Click on a keyword to see the terms included in the search<li>Hover your pointer over a node will hide other links <li>Nodes can be moved around for better visibility, reload the page will restore the original layout<p>"
     with open(session['path']+"_cy","r") as f:
         elements=f.read()
     with open(session['path']+"_0link","r") as z:
