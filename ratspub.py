@@ -86,11 +86,13 @@ def searchArchived(sets, query):
     for key in catCnt.keys():
         if sets=='gwas':
             nc=nodecolor["gwas"]
+            nodes += "{ data: { id: '" + key +  "', nodecolor: '" + nc + "', url:'https://www.ebi.ac.uk/gwas/search?query="+key.replace("_GWAS","")+"' } },\n"
         elif key in drug_d.keys():
             nc=nodecolor["drug"]
+            nodes += "{ data: { id: '" + key +  "', nodecolor: '" + nc + "', url:'/shownode?node="+key+"' } },\n"
         else:
             nc=nodecolor["addiction"]
-        nodes += "{ data: { id: '" + key +  "', nodecolor: '" + nc + "', nodetype: 'top150', url:'/shownode?node="+key+"' } },\n"
+            nodes += "{ data: { id: '" + key +  "', nodecolor: '" + nc + "', url:'/shownode?node="+key+"' } },\n"
         edgeID=dataFile+"|"+query+"|"+key
         edges+="{ data: { id: '" + edgeID+ "', source: '" + query + "', target: '" + key + "', sentCnt: " + str(catCnt[key]) + ",  url:'/sentences?edgeID=" + edgeID + "' } },\n"
     return(nodes+edges)

@@ -63,14 +63,14 @@ def search():
             sent0=gene_category(gene, addiction_d, addiction, "addiction")
             e0=generate_edges(sent0, tf_name)
             #  
-            function=undic(function_d)
-            sent1=gene_category(gene, function_d, function, "function")
+            drug=undic(drug_d)
+            sent1=gene_category(gene, drug_d, drug, "drug")
             progress+=percent
             yield "data:"+str(progress)+"\n\n"
             e1=generate_edges(sent1, tf_name)
             #
-            drug=undic(drug_d)
-            sent2=gene_category(gene, drug_d, drug, "drug")
+            function=undic(function_d)
+            sent2=gene_category(gene, function_d, function, "function")
             progress+=percent
             yield "data:"+str(progress)+"\n\n"
             e2=generate_edges(sent2, tf_name)
@@ -223,7 +223,6 @@ def showGeneTopGene ():
     with open(session['path']+"_ggResult", "r") as result_f:
         results=result_f.read()
     return render_template('sentences.html', sentences=results+"<p><br>")
-
 
 ## generate a page that lists all the top 150 addiction genes with links to cytoscape graph.
 @app.route("/allTopGenes")
