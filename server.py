@@ -36,7 +36,7 @@ def progress():
     # generate a unique session ID to track the results 
     tf_path=tempfile.gettempdir()
     session['path']=tf_path+"/tmp" + ''.join(random.choice(string.ascii_letters) for x in range(6))
-    return render_template('progress.html')
+    return render_template('progress.html', url_in="search", url_out="cytoscape")
 
 @app.route("/search")
 def search():
@@ -81,9 +81,10 @@ def search():
             # gwas
             e4=searchArchived('gwas', gene)
             geneEdges=e0+e1+e2+e3+e4
+            ## there is a bug here. zero link notes are not excluded anymore
             if len(geneEdges) >1:
                 edges+=geneEdges
-                nodes+="{ data: { id: '" + gene +  "', nodecolor:'#E74C3C', fontweight:700, url:'/gene_gene?gene="+gene+"'} },\n"
+                nodes+="{ data: { id: '" + gene +  "', nodecolor:'#E74C3C', fontweight:700, url:'/startGeneGene?forTopGene="+gene+"'} },\n"
             else:
                 nodesToHide+=gene +  " "
             sentences+=sent0+sent1+sent2+sent3
@@ -140,56 +141,89 @@ def shownode():
     out="<p>"+node.upper()+"<hr><li>"+ allnodes[node].replace("|", "<li>")
     return render_template('sentences.html', sentences=out+"<p>")
 
-@app.route("/gene_gene")
+@app.route("/startGeneGene")
+def startGeneGene():
+    session['forTopGene']=request.args.get('forTopGene')
+    return render_template('progress.html', url_in="searchGeneGene", url_out="showGeneTopGene")
+
+@app.route("/searchGeneGene")
 def gene_gene():
-    query=request.args.get("gene")
     tmp_ggPMID=session['path']+"_ggPMID"
-    os.system("esearch -db pubmed -query \"" +  query + "\" | efetch -format uid |sort >" + tmp_ggPMID)
-    abstracts=os.popen("comm -1 -2 topGene_uniq.pmid " + tmp_ggPMID + " |fetch-pubmed -path "+pubmed_path+ " | xtract -pattern PubmedArticle -element MedlineCitation/PMID,ArticleTitle,AbstractText|sed \"s/-/ /g\"").read()
-    os.system("rm "+tmp_ggPMID)
-    topGenes=dict()
-    out=str()
-    hitGenes=dict()
-    with open("./topGene_symb_alias.txt", "r") as top_f:
-        for line in top_f:
-            (symb, alias)=line.strip().split("\t")
-            topGenes[symb]=alias.replace("; ","|")
-    for row in abstracts.split("\n"):
-        tiab=row.split("\t")
-        pmid = tiab.pop(0)
-        tiab= " ".join(tiab)
-        sentences = sent_tokenize(tiab)
-        ## keep the sentence only if it contains the gene 
-        for sent in sentences:
-            if findWholeWord(query)(sent):
-                sent=re.sub(r'\b(%s)\b' % query, r'<strong>\1</strong>', sent, flags=re.I)
-                for symb in topGenes:
-                    allNames=symb+"|"+topGenes[symb]
-                    if findWholeWord(allNames)(sent) :
-                        sent=sent.replace("<b>","").replace("</b>","")
-                        sent=re.sub(r'\b(%s)\b' % allNames, r'<b>\1</b>', sent, flags=re.I)
-                        out+=query+"\t"+"gene\t" + symb+"\t"+pmid+"\t"+sent+"\n"
-                        if symb in hitGenes.keys():
-                            hitGenes[symb]+=1
-                        else:
-                            hitGenes[symb]=1
     gg_file=session['path']+"_ggSent" #gene_gene
-    with open(gg_file, "w+") as gg:
-        gg.write(out)
-        gg.close()
-    results="<h4>"+query+" vs top addiction genes</h4> Click on the number of sentences will show those sentences. Click on the <span style=\"background-color:#FcF3cf\">top addiction genes</span> will show an archived search for that gene.<hr>"
-    topGeneHits={}
-    for key in hitGenes.keys():
-        url=gg_file+"|"+query+"|"+key
-        if hitGenes[key]==1:
-            sentword="sentence"
-        else:
-            sentword="sentences"
-        topGeneHits[ "<li> <a href=/sentences?edgeID=" + url+ " target=_new>" + "Show " + str(hitGenes[key]) + " " + sentword +" </a> about "+query+" and <a href=/showTopGene?topGene="+key+" target=_gene><span style=\"background-color:#FcF3cf\">"+key+"</span></a>" ]=hitGenes[key]
-    topSorted = [(k, topGeneHits[k]) for k in sorted(topGeneHits, key=topGeneHits.get, reverse=True)]
-    for k,v in topSorted:
-        results+=k
-    return render_template("sentences.html", sentences=results+"<p><br>")
+    result_file=session['path']+"_ggResult"
+    def generate(query):
+        progress=1
+        yield "data:"+str(progress)+"\n\n"
+        os.system("esearch -db pubmed -query \"" +  query + "\" | efetch -format uid |sort >" + tmp_ggPMID)
+        abstracts=os.popen("comm -1 -2 topGene_uniq.pmid " + tmp_ggPMID + " |fetch-pubmed -path "+pubmed_path+ " | xtract -pattern PubmedArticle -element MedlineCitation/PMID,ArticleTitle,AbstractText|sed \"s/-/ /g\"").read()
+        os.system("rm "+tmp_ggPMID)
+        progress=10
+        yield "data:"+str(progress)+"\n\n"
+        topGenes=dict()
+        out=str()
+        hitGenes=dict()
+        with open("topGene_symb_alias.txt", "r") as top_f:
+            for line in top_f:
+                (symb, alias)=line.strip().split("\t")
+                topGenes[symb]=alias.replace("; ","|")
+        allAbstracts= abstracts.split("\n")
+        abstractCnt=len(allAbstracts)
+        rowCnt=0
+        for row in allAbstracts:
+            rowCnt+=1
+            if rowCnt/10==int(rowCnt/10):
+                progress=10+round(rowCnt/abstractCnt,2)*80
+                yield "data:"+str(progress)+"\n\n"
+            tiab=row.split("\t")
+            pmid = tiab.pop(0)
+            tiab= " ".join(tiab)
+            sentences = sent_tokenize(tiab)
+            ## keep the sentence only if it contains the gene 
+            for sent in sentences:
+                if findWholeWord(query)(sent):
+                    sent=re.sub(r'\b(%s)\b' % query, r'<strong>\1</strong>', sent, flags=re.I)
+                    for symb in topGenes:
+                        allNames=symb+"|"+topGenes[symb]
+                        if findWholeWord(allNames)(sent) :
+                            sent=sent.replace("<b>","").replace("</b>","")
+                            sent=re.sub(r'\b(%s)\b' % allNames, r'<b>\1</b>', sent, flags=re.I)
+                            out+=query+"\t"+"gene\t" + symb+"\t"+pmid+"\t"+sent+"\n"
+                            if symb in hitGenes.keys():
+                                hitGenes[symb]+=1
+                            else:
+                                hitGenes[symb]=1
+        progress=95
+        yield "data:"+str(progress)+"\n\n"
+        with open(gg_file, "w+") as gg:
+            gg.write(out)
+            gg.close()
+        results="<h4>"+query+" vs top addiction genes</h4> Click on the number of sentences will show those sentences. Click on the <span style=\"background-color:#FcF3cf\">top addiction genes</span> will show an archived search for that gene.<hr>"
+        topGeneHits={}
+        for key in hitGenes.keys():
+            url=gg_file+"|"+query+"|"+key
+            if hitGenes[key]==1:
+                sentword="sentence"
+            else:
+                sentword="sentences"
+            topGeneHits[ "<li> <a href=/sentences?edgeID=" + url+ " target=_new>" + "Show " + str(hitGenes[key]) + " " + sentword +" </a> about "+query+" and <a href=/showTopGene?topGene="+key+" target=_gene><span style=\"background-color:#FcF3cf\">"+key+"</span></a>" ]=hitGenes[key]
+        topSorted = [(k, topGeneHits[k]) for k in sorted(topGeneHits, key=topGeneHits.get, reverse=True)]
+        for k,v in topSorted:
+            results+=k
+        saveResult=open(result_file, "w+")
+        saveResult.write(results)
+        saveResult.close()
+        progress=100
+        yield "data:"+str(progress)+"\n\n"
+    ## start the run
+    query=session['forTopGene']
+    return Response(generate(query), mimetype='text/event-stream')
+
+@app.route('/showGeneTopGene')
+def showGeneTopGene ():
+    with open(session['path']+"_ggResult", "r") as result_f:
+        results=result_f.read()
+    return render_template('sentences.html', sentences=results+"<p><br>")
+
 
 ## generate a page that lists all the top 150 addiction genes with links to cytoscape graph.
 @app.route("/allTopGenes")
