@@ -1,7 +1,7 @@
 addiction_d = {"reward":"reward|hedonic|incentive|intracranial self stimulation|ICSS|reinforcement|reinforcing|conditioned place preference|CPP|self administration|self administered|drug reinforced|operant|instrumental response",
         "aversion":"aversion|aversive|CTA|conditioned taste aversion",
         "withdrawal":"withdrawal",
-        "relapse":"relapse|reinstatement|craving|drug seeking|seeking|incubation",
+        "relapse":"relapse|reinstatement|craving|drug seeking|seeking",
         "sensitization":"sensitization",
         "addiction":"addiction|addictive|drug abuse|punishment|compulsive|escalation",
         "dependence":"dependence",
