@@ -24,6 +24,7 @@ def progress():
     genes=request.args.get('query')
     genes=genes.replace(",", " ")
     genes=genes.replace(";", " ")
+    genes=re.sub(r'\bLOC\d*?\b', "", genes, flags=re.I)
     genes=genes.split()
     if len(genes)>=100:
         message="<span class='text-danger'>Up to 100 terms can be searched at a time</span>"
