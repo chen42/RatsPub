@@ -230,4 +230,4 @@ def top150genes():
     return render_template("topAddictionGene.html")
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=4200)
