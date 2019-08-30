@@ -6,7 +6,6 @@ from ratspub_keywords import *
 
 global function_d, brain_d, drug_d, addiction_d, brain_query_term, pubmed_path
 
-
 ## turn dictionary (synonyms) to regular expression
 def undic(dic):
     return "|".join(dic.values())
@@ -103,14 +102,15 @@ function=undic(function_d)
 addiction=undic(addiction_d)
 drug=undic(drug_d)
 
-nodecolor={'function':"#A9CCE3", 'addiction': "#D7BDE2", 'drug': "#F9E79F", 'brain':"#A3E4D7", 'gwas':"#AEB6BF"}
-#https://htmlcolorcodes.com/
+nodecolor={'function':"#A9CCE3", 'addiction': "#D7BDE2", 'drug': "#F9E79F", 'brain':"#A3E4D7", 'gwas':"#AEB6BF", 'stress':"#EDBB99", 'psychiatric':"#F5B7B1"}
+#https://htmlcolorcodes.com/ third column down
 n0=generate_nodes(function_d, 'function')
 n1=generate_nodes(addiction_d, 'addiction')
 n2=generate_nodes(drug_d, 'drug')
 n3=generate_nodes(brain_d, 'brain')
-default_nodes=n0+n1+n2+n3
-
+n4=generate_nodes(stress_d, 'stress')
+n5=generate_nodes(psychiatric_d, 'psychiatric')
+default_nodes=n0+n1+n2+n3+n4+n5
 
 host= os.popen('hostname').read().strip()
 if host=="x1":

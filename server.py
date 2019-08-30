@@ -20,7 +20,7 @@ def about():
 
 @app.route('/progress')
 def progress():
-    # only 1-6 terms are allowed
+    # only 1-100 terms are allowed
     genes=request.args.get('query')
     genes=genes.replace(",", " ")
     genes=genes.replace(";", " ")
@@ -42,7 +42,7 @@ def progress():
 @app.route("/search")
 def search():
     genes=session['query']
-    percent=round(100/(len(genes)*4),1)
+    percent=round(100/(len(genes)*6),1) # 6 categories 
     snt_file=session['path']+"_snt"
     cysdata=open(session['path']+"_cy","w+")
     sntdata=open(snt_file,"w+")
@@ -79,16 +79,34 @@ def search():
             sent3=gene_category(gene, brain_d, brain_query_term, "brain")
             progress+=percent
             e3=generate_edges(sent3, tf_name)
+            # stress
+            stress=undic(stress_d)
+            sent4=gene_category(gene, stress_d, stress, "drug")
+            progress+=percent
+            yield "data:"+str(progress)+"\n\n"
+            e4=generate_edges(sent4, tf_name)
+            # psychiatric 
+            psychiatric=undic(psychiatric_d)
+            sent5=gene_category(gene, psychiatric_d, psychiatric, "psychiatric")
+            progress+=percent
+            yield "data:"+str(progress)+"\n\n"
+            e5=generate_edges(sent5, tf_name)
             # gwas
-            e4=searchArchived('gwas', gene)
-            geneEdges=e0+e1+e2+e3+e4
+            e6=searchArchived('gwas', gene)
+            geneEdges=e0+e1+e2+e3+e4+e5+e6
             ## there is a bug here. zero link notes are not excluded anymore
             if len(geneEdges) >1:
                 edges+=geneEdges
                 nodes+="{ data: { id: '" + gene +  "', nodecolor:'#E74C3C', fontweight:700, url:'/startGeneGene?forTopGene="+gene+"'} },\n"
             else:
                 nodesToHide+=gene +  " "
-            sentences+=sent0+sent1+sent2+sent3
+            sentences+=sent0+sent1+sent2+sent3+sent4+sent5
+            sent0=None 
+            sent1=None
+            sent2=None
+            sent3=None
+            sent4=None
+            sent5=None
             #save data before the last yield
             searchCnt+=1
             if (searchCnt==len(genes)):
@@ -138,7 +156,7 @@ def showTopGene():
 @app.route("/shownode")
 def shownode():
     node=request.args.get('node')
-    allnodes={**brain_d, **drug_d, **function_d, **addiction_d}
+    allnodes={**brain_d, **drug_d, **function_d, **addiction_d, **stress_d, **psychiatric_d}
     out="<p>"+node.upper()+"<hr><li>"+ allnodes[node].replace("|", "<li>")
     return render_template('sentences.html', sentences=out+"<p>")
 

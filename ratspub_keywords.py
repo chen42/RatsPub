@@ -31,3 +31,15 @@ function_d={"signalling":"signalling|signaling|phosphorylation|glycosylation",
             "neurotransmission": "neurotransmission|neuropeptides|neuropeptide|glutamate|glutamatergic|GABA|GABAergic|dopamine|dopaminergic|DAergic|cholinergic|nicotinic|muscarinic|serotonergic|serotonin|5 ht|acetylcholine",
             }
 #"regulation":"increased|decreased|regulated|inhibited|stimulated",
+
+stress_d={"stress":"stress|psycological trauma|distress",
+          "PTSD":"PTSD"
+         }
+psychiatric_d={"anxiety":"anxiety|anxious",
+               "depression":"depression|depressive",
+               "bipolar":"bipolar disorder",
+               "impulsivity":"impulsivity|impulsive",
+               "compulsive":"compulsive|obssessive",
+               "schizophrenia": "schizophrenia",
+               "autism": "autism|autistic"
+               }
