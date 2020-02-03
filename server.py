@@ -81,7 +81,7 @@ def search():
             e3=generate_edges(sent3, tf_name)
             # stress
             stress=undic(stress_d)
-            sent4=gene_category(gene, stress_d, stress, "drug")
+            sent4=gene_category(gene, stress_d, stress, "stress")
             progress+=percent
             yield "data:"+str(progress)+"\n\n"
             e4=generate_edges(sent4, tf_name)
