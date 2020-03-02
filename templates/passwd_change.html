@@ -1,0 +1,29 @@
+{% extends "about.html" %}
+{% block title %}Password Change{%endblock%}
+{% block content %}
+
+<table>
+    <tr>
+        <td width="60%">
+            {{ super() }}
+        </td>
+        <td width="40%">
+            <b>Welcome, {{name}}</b>
+            <hr>
+            <b>Type your new password below:</b>
+            <form class="p-2" action="#" method="POST">
+                <div class="form-group">                   
+                    <input type="password" class="form-control" name="password" id="password" placeholder="Password" required>      
+                    <div class="dropdown-divider"></div>        
+                    <button type="submit" class="btn btn-primary btn-block">Change my password</button>
+                </div>
+            </form>
+        </td>
+    </tr>
+</table>
+
+
+
+
+
+{% endblock %}
