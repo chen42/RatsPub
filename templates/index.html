@@ -2,17 +2,24 @@
 {% block content %}
 {{ message | safe }}
 
-<h3> <u>R</u>elationship  with <u>A</u>ddiction <u>T</u>hrough <u>S</u>earches of <u>Pub</u>Med </span></a>
+<h3> <u>R</u>elationship with <u>A</u>ddiction <u>T</u>hrough <u>S</u>earches of <u>Pub</u>Med </span></a>
 </h3>
 
 <table>
 	<tr><td >
 
-<p> RatsPub searches PubMed to find <i>sentences</i> that contain the query terms (i.e., gene symbols) and  <a href="https://github.com/chen42/RatsPub/blob/master/ratspub_keywords.py">drug addiction-related keywords</a>.  These gene-keyword relationships are presented as an interactive graph that can efficiently  answer the question <b>"What do we know about these genes and addiction?". </b> Data from <a href="https://www.ebi.ac.uk/gwas/">EBI GWAS catalog </a>are also included in the search to better answer this question.
+<p> RatsPub searches PubMed to find <i>sentences</i> that contain the query terms (i.e., gene symbols) and <a href="https://github.com/chen42/RatsPub/blob/master/ratspub_keywords.py">drug addiction-related keywords</a>. These gene-keyword relationships are presented as an interactive graph that can efficiently answer the question <b>"What do we know about these genes and addiction?". </b> Data from <a href="https://www.ebi.ac.uk/gwas/">EBI GWAS catalog </a>are also included in the search.  The graph has many interactive elements. For example, clicking gene names will launch a new search for sentences containing the target gene and 200 addiction-related genes. A tabular view is also available. </b>
 
-<p> The graph has many interactive elements. For example, clicking gene names will launch a new search for sentences containing the target gene and 200 addiction-related genes. These results help to answer the question <b>"Are there  genes that can link my gene of interest to addiction?"  </b>
+		<p>Up to 100 gene symbols can be entered in the box below. Gene symbols can be separated by either a space or a semicolon. Aliases will <i>not</i> be automatically included because the large number of false matches associated with gene synonyms retrieved from databases. 
 
-<p>Up to 100 gene symbols can be searched at a time. Gene symbols can be separated by either a space or a semicolon.  Gene alias will <i>not</i> be automatically included because the large number of false matches associated with gene synonyms retrieved from databases. 
+	<b>	{%if "name" in session %}
+		{{session['name']}}, your previous searches are <a href="/userarchive">archived </a> for faster retrival.</a>
+	{% else %}
+		Please sign in to save your searches.
+	{% endif %}
+	</b>
+
+
 		</td>
 		<td >
 			<div class='img'><img src="/static/ratspub.png" class="img-fluid">
@@ -20,20 +27,33 @@
 	</tr>
 </table>
 
-	<p>
-	<b>Example</b>: Rgma Nrxn3 Chrna3
+	<a>
 
-<br> 
-    <form action="/progress">
+<b> Example: </b>Rgma Nrxn3 Chrna3 <p> 
+
+	<form action="/progress">
+	<div class="form-group row">
+		<div class="col-sm-10">
+	<strong>Please choose keyword categories to be included in the search:</strong>
+			<label>
+			<input type="checkbox" name="type" value="GWAS" checked> Human GWAS 	
+			<input type="checkbox" name="type" value="addiction" checked> Addiction Stage 				
+			<input type="checkbox" name="type" value="drug" checked> Drugs		
+			<input type="checkbox" name="type" value="brain" checked> Brain region				
+			<input type="checkbox" name="type" value="stress" checked> Stress				
+			<input type="checkbox" name="type" value="psychiatric" checked> Psychiatric Diseases
+			<input type="checkbox" name="type" value="function" checked> Function				
+			</label>
+		</div>
+
+ 
 	<textarea name="query" class="form-control form-control-lg" type="search" row="3" id="searchform">
 	</textarea>
-  <div class="form-group row">
-    <div class="col-sm-10">
-      <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
-  </div>
+ <button type="submit" class="btn btn-primary">Search</button>
+ </div>
+	</form>
 
-    </form>
+
 {% endblock %}
 
 
