@@ -1,17 +1,151 @@
 #!/bin/env  python3
-from flask import Flask, render_template, request, session, Response
+from flask import Flask, render_template, request, session, Response, redirect, url_for, flash
+from flask_sqlalchemy import SQLAlchemy
+import json
+import shutil
+from flask import jsonify
+from datetime import datetime
+import bcrypt
 import tempfile
 import random
 import string
 from ratspub import *
 import time
 import os
+import re
+import pytz
 
 app=Flask(__name__)
 app.config['SECRET_KEY'] = '#DtfrL98G5t1dC*4'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///userspub.sqlite'
+db = SQLAlchemy(app)
+
+# the sqlite database
+class users(db.Model):
+    __tablename__='user'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), nullable=False)
+    email = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(128), nullable=False)
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)
 
 @app.route("/")
 def root():
+    return render_template('index.html')
+
+@app.route("/login", methods=["POST", "GET"])
+def login():
+    email = None
+    if request.method == "POST":
+        email = request.form['email']
+        password = request.form['password']
+        found_user = users.query.filter_by(email=email).first()
+        if (found_user and (bcrypt.checkpw(password.encode('utf8'), found_user.password))):
+            session['email'] = found_user.email
+            session['name'] = found_user.name
+            session['id'] = found_user.id
+        else:
+            flash("Invalid username or password!", "loginout")
+            return render_template('signup.html')
+    flash("Login Succesful!", "loginout")
+    return render_template('index.html')
+
+@app.route("/signup", methods=["POST", "GET"])
+def signup():
+    if request.method == "POST":
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password']
+        found_user = users.query.filter_by(email=email).first()
+        if (found_user and (bcrypt.checkpw(password.encode('utf8'), found_user.password)==False)):
+            flash(f"Already registered, but wrong password!", "loginout")
+            return render_template('signup.html')        
+        session['email'] = email
+        session['name'] = name
+        password = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
+        user = users(name=name, email=email, password = password)       
+        if found_user:
+            session['email'] = found_user.email
+            session['id'] = found_user.id
+            found_user.name = name
+            db.session.commit()
+        else:
+            db.session.add(user)
+            db.session.commit()
+            newuser = users.query.filter_by(email=session['email']).first()
+            session['id'] = newuser.id
+        flash(f"Login Succesful!", "loginout")
+        return render_template('index.html')
+    else:
+        if 'email' in session:
+            flash("Already Logged In!")
+            return render_template('index.html')
+        return render_template('signup.html')
+
+@app.route("/signin", methods=["POST", "GET"])
+def signin():
+    email = None
+    if request.method == "POST":
+        email = request.form['email']
+        password = request.form['password']
+        found_user = users.query.filter_by(email=email).first()
+        if (found_user and (bcrypt.checkpw(password.encode('utf8'), found_user.password))):
+            session['email'] = found_user.email
+            session['name'] = found_user.name
+            session['id'] = found_user.id
+            flash(f"Login Succesful!", "loginout")
+            return render_template('index.html')
+        else:
+            flash(f"Invalid username or password!", "loginout")
+            return render_template('signup.html')   
+    return render_template('signin.html')
+
+# change password 
+@app.route("/<nm_passwd>", methods=["POST", "GET"])
+def profile(nm_passwd):
+    try:
+        if "_" in str(nm_passwd):
+            user_name = str(nm_passwd).split("_")[0]
+            user_passwd = str(nm_passwd).split("_")[1]
+            user_passwd = "b\'"+user_passwd+"\'"
+            found_user = users.query.filter_by(name=user_name).first()
+            if request.method == "POST":
+                password = request.form['password']
+                session['email'] = found_user.email
+                session['name'] = found_user.name
+                session['id'] = found_user.id
+                password = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
+                found_user.password = password
+                db.session.commit()
+                flash(f"Your password is changed!", "loginout")
+                return render_template('index.html')
+            # remove reserved characters from the hashed passwords
+            reserved = (";", "/", "?", ":", "@", "=", "&", ".")
+            def replace_reserved(fullstring):
+                for replace_str in reserved:
+                    fullstring = fullstring.replace(replace_str,"")
+                return fullstring
+            replaced_passwd = replace_reserved(str(found_user.password))
+            if replaced_passwd == user_passwd:
+                return render_template("/passwd_change.html", name=user_name)
+            else:
+                return "This url does not exist"
+        else: 
+            return "This url does not exist"
+    except (AttributeError):
+        return "This url does not exist"
+
+@app.route("/logout")
+def logout():
+    if 'email' in session:
+        global user1
+        if session['name'] != '':
+            user1 = session['name']
+        else: 
+            user1 = session['email']
+    flash(f"You have been logged out, {user1}", "loginout")
+    session.pop('email', None)
+    session.clear()
     return render_template('index.html')
 
 @app.route("/about")
@@ -20,6 +154,11 @@ def about():
 
 @app.route('/progress')
 def progress():
+    #get the type from checkbox
+    search_type = request.args.getlist('type')
+    if (search_type == []):
+        search_type = ['GWAS', 'function', 'addiction', 'drug', 'brain', 'stress', 'psychiatric']
+    session['search_type'] = search_type
     # only 1-100 terms are allowed
     genes=request.args.get('query')
     genes=genes.replace(",", " ")
@@ -32,29 +171,88 @@ def progress():
     elif len(genes)==0:
         message="<span class='text-danger'>Please enter a search term </span>"
         return render_template('index.html', message=message)
-    # put the query in session cookie
-    session['query']=genes
-    # generate a unique session ID to track the results 
     tf_path=tempfile.gettempdir()
-    session['path']=tf_path+"/tmp" + ''.join(random.choice(string.ascii_letters) for x in range(6))
+    session['path']=tf_path+"/tmp" + ''.join(random.choice(string.ascii_letters) for x in range(6)) 
+    # put the query in session cookie
+    session['query']=genes 
     return render_template('progress.html', url_in="search", url_out="cytoscape")
 
 @app.route("/search")
 def search():
     genes=session['query']
+    genes_for_folder_name =""
+    if len(genes) == 1:
+        marker = ""
+        genes_for_folder_name =str(genes[0])
+    elif len(genes) == 2:
+        marker = ""
+        genes_for_folder_name =str(genes[0])+"_"+str(genes[1])
+    elif len(genes) == 3:
+        marker = ""
+        genes_for_folder_name =str(genes[0])+"_"+str(genes[1])+"_"+str(genes[2])
+    else:
+        genes_for_folder_name =str(genes[0])+"_"+str(genes[1])+"_"+str(genes[2])
+        marker="_m"
+
+    # generate a unique session ID depending on timestamp to track the results 
+    timestamp = datetime.utcnow().replace(microsecond=0)
+    timestamp = timestamp.replace(tzinfo=pytz.utc)
+    timestamp = timestamp.astimezone(pytz.timezone("America/Chicago"))
+    session['timestamp'] = timestamp    
+    timeextension = str(timestamp)
+    timeextension = timeextension.replace(':', '_')
+    timeextension = timeextension.replace('-', '_')
+    timeextension = timeextension.replace(' ', '_')
+    timeextension = timeextension.replace('_06_00', '')
+    user_login=0
+    #create a folder for the search
+    if ('email' in session):
+        user_login=1
+        os.makedirs("./user/"+str(session['email']+"/"+timeextension+"_0_"+genes_for_folder_name+marker),exist_ok=True)
+        session['user_folder'] = "./user/"+str(session['email'])
+        user_folder=session['user_folder']
+        session['path'] = "./user/"+str(session['email'])+"/"+timeextension+"_0_"+genes_for_folder_name+marker+"/"+timeextension
     percent=round(100/(len(genes)*6),1) # 6 categories 
     snt_file=session['path']+"_snt"
     cysdata=open(session['path']+"_cy","w+")
     sntdata=open(snt_file,"w+")
     zeroLinkNode=open(session['path']+"_0link","w+")
+    search_type = session['search_type']
+    #consider the types got from checkbox
+    temp_nodes = ""
+    json_nodes = "{\"data\":["
+    if ("function" in search_type):
+        temp_nodes += n0
+        json_nodes += nj0
+    if ("addiction" in search_type):
+        temp_nodes += n1   
+        json_nodes += nj1    
+    if ("drug" in search_type):
+        temp_nodes += n2
+        json_nodes += nj2
+    if ("brain" in search_type):
+        temp_nodes += n3
+        json_nodes += nj3
+    if ("stress" in search_type):
+        temp_nodes += n4
+        json_nodes += nj4
+    if ("psychiatric" in search_type):
+        temp_nodes += n5  
+        json_nodes += nj5   
+    if ("GWAS" in search_type):
+        temp_nodes += n6  
+        json_nodes += nj6
+    json_nodes = json_nodes[:-2]
+    json_nodes =json_nodes+"]}"
     def generate(genes, tf_name):
         sentences=str()
         edges=str()
-        nodes=default_nodes
+        nodes = temp_nodes
         progress=0
         searchCnt=0
         nodesToHide=str()
-        for  gene in genes:
+        json_edges = str()
+        for gene in genes:
             gene=gene.replace("-"," ")
             # report progress immediately
             progress+=percent
@@ -63,37 +261,66 @@ def search():
             addiction=undic(addiction_d) +") AND ("+undic(drug_d)
             sent0=gene_category(gene, addiction_d, addiction, "addiction")
             e0=generate_edges(sent0, tf_name)
-            #  
+            ej0=generate_edges_json(sent0, tf_name)
+            # drug
             drug=undic(drug_d)
             sent1=gene_category(gene, drug_d, drug, "drug")
             progress+=percent
             yield "data:"+str(progress)+"\n\n"
             e1=generate_edges(sent1, tf_name)
-            #
+            ej1=generate_edges_json(sent1, tf_name)
+            # function
             function=undic(function_d)
             sent2=gene_category(gene, function_d, function, "function")
             progress+=percent
             yield "data:"+str(progress)+"\n\n"
             e2=generate_edges(sent2, tf_name)
+            ej2=generate_edges_json(sent2, tf_name)
             # brain has its own query terms that does not include the many short acronyms
             sent3=gene_category(gene, brain_d, brain_query_term, "brain")
             progress+=percent
             e3=generate_edges(sent3, tf_name)
+            ej3=generate_edges_json(sent3, tf_name)
             # stress
             stress=undic(stress_d)
             sent4=gene_category(gene, stress_d, stress, "stress")
             progress+=percent
             yield "data:"+str(progress)+"\n\n"
             e4=generate_edges(sent4, tf_name)
+            ej4=generate_edges_json(sent4, tf_name)
             # psychiatric 
             psychiatric=undic(psychiatric_d)
             sent5=gene_category(gene, psychiatric_d, psychiatric, "psychiatric")
             progress+=percent
             yield "data:"+str(progress)+"\n\n"
             e5=generate_edges(sent5, tf_name)
-            # gwas
-            e6=searchArchived('gwas', gene)
-            geneEdges=e0+e1+e2+e3+e4+e5+e6
+            ej5=generate_edges_json(sent5, tf_name)
+            # GWAS
+            e6=searchArchived('GWAS', gene, 'cys')
+            ej6=searchArchived('GWAS', gene , 'json')
+            #consider the types got from checkbox
+            geneEdges = ""
+            if ("addiction" in search_type):
+                geneEdges += e0
+                json_edges += ej0
+            if ("drug" in search_type):
+                geneEdges += e1   
+                json_edges += ej1    
+            if ("function" in search_type):
+                geneEdges += e2
+                json_edges += ej2
+            if ("brain" in search_type):
+                geneEdges += e3
+                json_edges += ej3
+            if ("stress" in search_type):
+                geneEdges += e4
+                json_edges += ej4
+            if ("psychiatric" in search_type):
+                geneEdges += e5  
+                json_edges += ej5  
+            if ("GWAS" in search_type):
+                geneEdges += e6  
+                json_edges += ej6                           
             ## there is a bug here. zero link notes are not excluded anymore
             if len(geneEdges) >1:
                 edges+=geneEdges
@@ -113,16 +340,157 @@ def search():
                 progress=100
                 sntdata.write(sentences)
                 sntdata.close()
-                cysdata.write(nodes+edges)
+                cysdata.write(nodes+edges)               
                 cysdata.close()
                 zeroLinkNode.write(nodesToHide)
                 zeroLinkNode.close()
             yield "data:"+str(progress)+"\n\n"
+        #edges in json format
+        json_edges="{\"data\":["+json_edges
+        json_edges = json_edges[:-2]
+        json_edges =json_edges+"]}"
+        #write edges to txt file in json format
+        with open("json_edges.txt", 'w') as edgesjson:
+            edgesjson.write(json_edges) 
+        #write edges to txt file in json format also in user folder
+        if (user_login == 1):
+            with open(user_folder+"/"+timeextension+"_0_"+genes_for_folder_name+marker+"/json_edges.txt", "w") as temp_file_edges:
+                temp_file_edges.write(json_edges)       
+    #write nodes to txt file in json format
+    with open("json_nodes.txt", 'w') as nodesjson:
+        #if (userlogin) == 1:             
+        nodesjson.write(json_nodes)
+    #write nodes to txt file in json format also in user folder
+    if ('email' in session):
+        with open("./user/"+str(session['email'])+"/"+timeextension+"_0_"+genes_for_folder_name+marker+"/json_nodes.txt", "w") as temp_file_nodes:
+            temp_file_nodes.write(json_nodes)
     return Response(generate(genes, snt_file), mimetype='text/event-stream')
+
+@app.route("/tableview")
+def tableview():
+    with open("json_nodes.txt") as jsonfile:
+        jnodes = json.load(jsonfile)
+    with open("json_edges.txt") as edgesjsonfile:
+        jedges = json.load(edgesjsonfile)
+    genename=session['query'] 
+    if len(genename)>3:
+        genename = genename[0:3]
+        added = ",..."
+    else:
+        added = ""
+    gene_name = str(genename)[1:]
+    gene_name=gene_name[:-1]
+    gene_name=gene_name.replace("'","")
+    gene_name = gene_name+added
+    num_gene = gene_name.count(',')+1
+    message3="<b> Notes: </b><li> Click on the abstract count to read sentences linking the keyword and the gene. <li> Click on a gene to search its relations with top 200 addiction genes. <li> Click on a keyword to see the terms included in the search. <li>View the results in <a href='cytoscape'><b> a graph.</b></a>"
+    return render_template('tableview.html', num_gene=num_gene,session_path = session['path'], jedges=jedges, jnodes=jnodes,gene_name=gene_name, message3=message3)
+
+@app.route("/tableview0")
+def tableview0():
+    with open("json_nodes.txt") as jsonfile:
+        jnodes = json.load(jsonfile)
+    with open("json_edges.txt") as edgesjsonfile:
+        jedges = json.load(edgesjsonfile)
+    genename=session['query'] 
+    if len(genename)>3:
+        genename = genename[0:3]
+        added = ",..."
+    else:
+        added = ""
+    gene_name = str(genename)[1:]
+    gene_name=gene_name[:-1]
+    gene_name=gene_name.replace("'","")
+    gene_name = gene_name+added
+    num_gene = gene_name.count(',')+1
+    message4="<b> Notes: </b><li> These are the words that have <b>zero</b> abstract counts. <li>View all the results in <a href='cytoscape'><b> a graph.</b></a>"
+    return render_template('tableview0.html', num_gene=num_gene,session_path = session['path'], jedges=jedges, jnodes=jnodes,gene_name=gene_name, message4=message4)
+
+@app.route("/userarchive")
+def userarchive():
+    if os.path.exists("./user/"+str(session['email'])) == False:
+        flash("Search history doesn't exist!")
+        return render_template('index.html')
+    if ('email' in session):
+        session['user_folder'] = "./user/"+str(session['email'])
+    session_id=session['id']
+    def sorted_alphanumeric(data):
+        convert = lambda text: int(text) if text.isdigit() else text.lower()
+        alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
+        return sorted(data, key=alphanum_key)
+    dirlist = sorted_alphanumeric(os.listdir(session['user_folder']))  
+    folder_list = []
+    directory_list = []
+    gene_list=[]
+    for filename in dirlist:
+        folder_list.append(filename)
+        gene_name = filename.split('_0_')[1]
+        if gene_name[-2:] == '_m':
+            gene_name = gene_name[:-2]
+            gene_name = gene_name + ", ..."
+        gene_name = gene_name.replace('_', ', ')
+        gene_list.append(gene_name)
+        gene_name=""
+        filename=filename[0:4]+"-"+filename[5:7]+"-"+filename[8:13]+":"+filename[14:16]+":"+filename[17:19]
+        directory_list.append(filename)
+    len_dir = len(directory_list)
+    message3="<b> Note: </b><li> Click on the Date/Time to view archived results.  <li>The Date/Time are based on US Central time zone. "
+    return render_template('userarchive.html', len_dir=len_dir, gene_list = gene_list, folder_list=folder_list, directory_list=directory_list, session_id=session_id, message3=message3)
+
+# delete this search
+@app.route('/remove', methods=['GET', 'POST'])
+def remove():
+    remove_folder = request.args.get('remove_folder')
+    shutil.rmtree("./user/"+str(session['email']+"/"+remove_folder), ignore_errors=True)
+    return redirect(url_for('userarchive'))
+
+@app.route('/date', methods=['GET', 'POST'])
+def date():
+    select_date = request.args.get('selected_date')
+    #open the cache folder for the user
+    tf_path="./user"
+    if ('email' in session):
+        time_extension = str(select_date)
+        time_extension = time_extension.split('_0_')[0]
+        time_extension = time_extension.replace(':', '_')
+        time_extension = time_extension.replace('-', '_')
+        session['path'] = tf_path+"/"+str(session['email'])+"/"+select_date+"/"+time_extension
+        session['user_folder'] = tf_path+"/"+str(session['email'])
+    else:
+        tf_path=tempfile.gettempdir()
+        session['path']=tf_path+"/tmp" + ''.join(random.choice(string.ascii_letters) for x in range(6)) 
+    with open(tf_path+"/"+str(session['email'])+"/"+select_date+"/json_edges.txt", "r") as archive_file:
+        with open("json_edges.txt", "w") as temp_file:
+            for line in archive_file:
+                temp_file.write(line)        
+    with open(tf_path+"/"+str(session['email'])+"/"+select_date+"/json_nodes.txt", "r") as archive_file:
+        with open("json_nodes.txt", "w") as temp_file:
+            for line in archive_file:
+                temp_file.write(line) 
+    with open("json_nodes.txt", "r") as jsonfile:
+        jnodes = json.load(jsonfile)
+    with open("json_edges.txt", "r") as edgesjsonfile:
+        jedges = json.load(edgesjsonfile)
+    gene_list=[]
+    for p in jedges['data']:
+        if p['source'] not in gene_list:
+            gene_list.append(p['source'])
+    if len(gene_list)>3:
+        gene_list = gene_list[0:3]
+        added = ",..."
+    else:
+        added = ""
+    gene_name = str(gene_list)[1:]
+    gene_name=gene_name[:-1]
+    gene_name=gene_name.replace("'","")
+    gene_name = gene_name+added
+    num_gene = gene_name.count(',')+1
+    message3="<b> Notes: </b><li>Click on the keywords to see the indicated number of abstracts <li> Click on a gene to search its relations with top 200 addiction genes<li>Click on a keyword to see the terms included in the search<li>Hover your pointer over a node will hide other links <li>Nodes can be moved around for better visibility, reload the page will restore the original layout<li> View the results in <a href='cytoscape'><b>a graph.</b></a>"
+    return render_template('tableview.html', title='', date=select_date, num_gene=num_gene,session_path = session['path'], jedges=jedges, jnodes=jnodes,gene_name=gene_name, message3=message3)
 
 @app.route('/cytoscape')
 def cytoscape():
-    message2="<b> This  <i>Genes vs Keywords</i> graph is interactive: </b><li>Click on a line to see the indicated number of sentences <li> Click on a gene to search its relations with top 200 addiction genes<li>Click on a keyword to see the terms included in the search<li>Hover your pointer over a node will hide other links <li>Nodes can be moved around for better visibility, reload the page will restore the original layout<p>"
+    message2="<b> Notes: </b><li>Click on a line to see the indicated number of abstracts <li> Click on a gene to search its relations with top 200 addiction genes<li>Click on a keyword to see the terms included in the search<li>Hover your pointer over a node will hide other links <li>Nodes can be moved around for better visibility, reload the page will restore the original layout<li>View the results in <a href='tableview'><b>a table. </b></a>"
     with open(session['path']+"_cy","r") as f:
         elements=f.read()
     with open(session['path']+"_0link","r") as z:
@@ -133,23 +501,33 @@ def cytoscape():
 
 @app.route("/sentences")
 def sentences():
+    pmid_temp=""
+    pmid_list=[]
     edge=request.args.get('edgeID')
     (tf_name, gene0, cat0)=edge.split("|")
-    out="<h3>"+gene0 + " and " + cat0  + "</h3><hr>\n"
+    out3=""
     with open(tf_name, "r") as df:
         all_sents=df.read()
     for sent in all_sents.split("\n"):
         if len(sent.strip())!=0:
            (gene,nouse,cat, pmid, text)=sent.split("\t")
-           if (gene.upper() == gene0.upper() and cat.upper() == cat0.upper()) :
-               out+= "<li> "+ text + " <a href=\"https://www.ncbi.nlm.nih.gov/pubmed/?term=" + pmid +"\" target=_new>PMID:"+pmid+"<br></a>"
+           if (gene.upper() == gene0.upper() and cat.upper() == cat0.upper() and (pmid+cat0 not in pmid_list)) :
+               out3+= "<li> "+ text + " <a href=\"https://www.ncbi.nlm.nih.gov/pubmed/?term=" + pmid +"\" target=_new>PMID:"+pmid+"<br></a>"
+               pmid_temp = pmid
+               pmid_list.append(pmid+cat0)
+    out1="<h3>"+gene0 + " and " + cat0  + "</h3><hr>\n"
+    if len(pmid_list)>1:
+        out2 = str(len(pmid_list)) + ' sentences in ' + str(len(pmid_list)) + ' studies' "<hr>\n"
+    else:
+        out2 = str(len(pmid_list)) + ' sentence in ' + str(len(pmid_list)) + ' study' "<hr>\n"
+    out= out1+ out2 +out3
     return render_template('sentences.html', sentences="<ol>"+out+"</ol><p>")
 
 ## show the cytoscape graph for one gene from the top gene list
 @app.route("/showTopGene")
 def showTopGene():
     query=request.args.get('topGene')
-    nodesEdges=searchArchived('topGene',query)
+    nodesEdges=searchArchived('topGene',query, 'cys')
     message2="<li><strong>"+query + "</strong> is one of the top addiction genes. <li> An archived search is shown. Click on the blue circle to update the results and include keywords for brain region and gene function. <strong> The update may take a long time to finish.</strong> "
     return render_template("cytoscape.html", elements=nodesEdges, message="Top addiction genes", message2=message2)
 
@@ -176,6 +554,7 @@ def gene_gene():
         os.system("esearch -db pubmed -query \"" +  query + "\" | efetch -format uid |sort >" + tmp_ggPMID)
         abstracts=os.popen("comm -1 -2 topGene_uniq.pmid " + tmp_ggPMID + " |fetch-pubmed -path "+pubmed_path+ " | xtract -pattern PubmedArticle -element MedlineCitation/PMID,ArticleTitle,AbstractText|sed \"s/-/ /g\"").read()
         os.system("rm "+tmp_ggPMID)
+        #abstracts = os.popen("esearch -db pubmed -query " +  query + " | efetch -format uid |fetch-pubmed -path "+ pubmed_path + " | xtract -pattern PubmedArticle -element MedlineCitation/PMID,ArticleTitle,AbstractText|sed \"s/-/ /g\"").read()
         progress=10
         yield "data:"+str(progress)+"\n\n"
         topGenes=dict()
@@ -249,4 +628,5 @@ def top150genes():
     return render_template("topAddictionGene.html")
 
 if __name__ == '__main__':
+    db.create_all()
     app.run(debug=True, port=4200)
