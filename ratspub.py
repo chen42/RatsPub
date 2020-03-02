@@ -48,43 +48,79 @@ def generate_nodes(nodes_d, nodetype):
         json0 += "{ data: { id: '" + node +  "', nodecolor: '" + nodecolor[nodetype] + "', nodetype: '"+nodetype + "', url:'/shownode?nodetype=" + nodetype + "&node="+node+"' } },\n"
     return(json0)
 
+def generate_nodes_json(nodes_d, nodetype):
+    # include all search terms even if there are no edges, just to show negative result 
+    nodes_json0 =str()
+    for node in nodes_d:
+        nodes_json0 += "{ \"id\": \"" + node +  "\", \"nodecolor\": \"" + nodecolor[nodetype] + "\", \"nodetype\": \"" + nodetype + "\", \"url\":\"/shownode?nodetype=" + nodetype + "&node="+node+"\" },\n"
+    return(nodes_json0)
+
 def generate_edges(data, filename):
+    pmid_temp=0
     json0=str()
     edgeCnts={}
     for line in  data.split("\n"):
         if len(line.strip())!=0:
             (source, cat, target, pmid, sent) = line.split("\t")
             edgeID=filename+"|"+source+"|"+target
-            if edgeID in edgeCnts:
+            if (edgeID in edgeCnts) and (pmid != pmid_temp):
                 edgeCnts[edgeID]+=1
-            else:
+                pmid_temp = pmid
+            elif (edgeID not in edgeCnts):
                 edgeCnts[edgeID]=1
+                pmid_temp = pmid
     for edgeID in edgeCnts:
         (filename, source,target)=edgeID.split("|")
         json0+="{ data: { id: '" + edgeID + "', source: '" + source + "', target: '" + target + "', sentCnt: " + str(edgeCnts[edgeID]) + ",  url:'/sentences?edgeID=" + edgeID + "' } },\n"
     return(json0)
 
-def searchArchived(sets, query):
+def generate_edges_json(data, filename):
+    pmid_temp=0
+    edges_json0=str()
+    edgeCnts={}
+    for line in  data.split("\n"):
+        if len(line.strip())!=0:
+            (source, cat, target, pmid, sent) = line.split("\t")
+            edgeID=filename+"|"+source+"|"+target
+            if (edgeID in edgeCnts) and (pmid != pmid_temp):
+                edgeCnts[edgeID]+=1
+                pmid_temp = pmid
+            elif (edgeID not in edgeCnts):
+                edgeCnts[edgeID]=1
+                pmid_temp = pmid
+    for edgeID in edgeCnts:
+        (filename, source,target)=edgeID.split("|")
+        edges_json0+="{ \"id\": \"" + edgeID + "\", \"source\": \"" + source + "\", \"target\": \"" + target + "\", \"sentCnt\": \"" + str(edgeCnts[edgeID]) + "\",  \"url\":\"/sentences?edgeID=" + edgeID + "\" },\n"
+    return(edges_json0)
+
+def searchArchived(sets, query, filetype):
     if sets=='topGene':
         dataFile="topGene_addiction_sentences.tab"
         nodes= "{ data: { id: '" + query +  "', nodecolor: '" + "#2471A3" + "', fontweight:700, url:'/progress?query="+query+"' } },\n"
-    elif sets=='gwas':
+
+    elif sets=='GWAS':
         dataFile="gwas_addiction.tab"
         nodes=str()
     with open(dataFile, "r") as sents:
+        pmid_list=[]
+        cat1_list=[]
         catCnt={}
         for sent in sents:
             (symb, cat0, cat1, pmid, sent)=sent.split("\t")
             if (symb.upper() == query.upper()) :
-                if cat1 in catCnt.keys():
+                if (cat1 in catCnt.keys()) and (pmid+cat1 not in pmid_list):
+                    pmid_list.append(pmid+cat1)
                     catCnt[cat1]+=1
-                else:
+                elif (cat1 not in catCnt.keys()):
                     catCnt[cat1]=1
+                    pmid_list.append(pmid+cat1)
+
     nodes= "{ data: { id: '" + query +  "', nodecolor: '" + "#2471A3" + "', fontweight:700, url:'/progress?query="+query+"' } },\n"
     edges=str()
+    gwas_json=str()
     for key in catCnt.keys():
-        if sets=='gwas':
-            nc=nodecolor["gwas"]
+        if sets=='GWAS':
+            nc=nodecolor["GWAS"]
             nodes += "{ data: { id: '" + key +  "', nodecolor: '" + nc + "', url:'https://www.ebi.ac.uk/gwas/search?query="+key.replace("_GWAS","")+"' } },\n"
         elif key in drug_d.keys():
             nc=nodecolor["drug"]
@@ -94,23 +130,35 @@ def searchArchived(sets, query):
             nodes += "{ data: { id: '" + key +  "', nodecolor: '" + nc + "', url:'/shownode?node="+key+"' } },\n"
         edgeID=dataFile+"|"+query+"|"+key
         edges+="{ data: { id: '" + edgeID+ "', source: '" + query + "', target: '" + key + "', sentCnt: " + str(catCnt[key]) + ",  url:'/sentences?edgeID=" + edgeID + "' } },\n"
-    return(nodes+edges)
-
+        gwas_json+="{ \"id\": \"" + edgeID + "\", \"source\": \"" + query + "\", \"target\": \"" + key + "\", \"sentCnt\": \"" + str(catCnt[key]) + "\",  \"url\":\"/sentences?edgeID=" + edgeID + "\" },\n"
+    if(filetype == 'cys'):
+        return(nodes+edges)
+    else:
+        return(gwas_json)
 # brain region has too many short acronyms to just use the undic function, so search PubMed using the following 
 brain_query_term="cortex|accumbens|striatum|amygadala|hippocampus|tegmental|mesolimbic|infralimbic|prelimbic|habenula"
 function=undic(function_d)
 addiction=undic(addiction_d)
 drug=undic(drug_d)
 
-nodecolor={'function':"#A9CCE3", 'addiction': "#D7BDE2", 'drug': "#F9E79F", 'brain':"#A3E4D7", 'gwas':"#AEB6BF", 'stress':"#EDBB99", 'psychiatric':"#F5B7B1"}
+nodecolor={'function':"#A9CCE3", 'addiction': "#D7BDE2", 'drug': "#F9E79F", 'brain':"#A3E4D7", 'GWAS':"#AEB6BF", 'stress':"#EDBB99", 'psychiatric':"#F5B7B1"}
 #https://htmlcolorcodes.com/ third column down
+
 n0=generate_nodes(function_d, 'function')
 n1=generate_nodes(addiction_d, 'addiction')
 n2=generate_nodes(drug_d, 'drug')
 n3=generate_nodes(brain_d, 'brain')
 n4=generate_nodes(stress_d, 'stress')
 n5=generate_nodes(psychiatric_d, 'psychiatric')
-default_nodes=n0+n1+n2+n3+n4+n5
+n6=generate_nodes(psychiatric_d, 'GWAS')
+
+nj0=generate_nodes_json(function_d, 'function')
+nj1=generate_nodes_json(addiction_d, 'addiction')
+nj2=generate_nodes_json(drug_d, 'drug')
+nj3=generate_nodes_json(brain_d, 'brain')
+nj4=generate_nodes_json(stress_d, 'stress')
+nj5=generate_nodes_json(psychiatric_d, 'psychiatric')
+nj6=generate_nodes_json(psychiatric_d, 'GWAS')
 
 host= os.popen('hostname').read().strip()
 if host=="x1":
