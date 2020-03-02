@@ -1,0 +1,35 @@
+{% extends "about.html" %}
+{% block title %}User Sign In{%endblock%}
+{% block content %}
+
+<table>
+  <tr>
+    <td width="60%">
+      {{ super() }}
+    </td>
+    <td width="40%">
+      <div style="clear: both">
+        <h4 style="float: left">Login&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h4>
+          <a href="signup" >or create an account</a>
+      </div>
+      <hr />
+      <form class="p-2" action="/signin" method="POST">
+        <div class="form-group">                    
+          <input type="email" class="form-control" name="email" id="email" aria-describedby="emailHelp" placeholder="Email address", value="{{email if email}}">
+        </div>
+        <div class="form-group"> 
+          <input type="password" class="form-control" name="password" id="password" placeholder="Password">     
+          <div class="dropdown-divider"></div>
+          <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+        </div>
+      </form>
+      If you forgot your password, you can <a href = "mailto: hakan@uthsc.edu">send email</a> us to get a new one. Please use your e-mail in the system. You can send to hakan@uthsc.edu
+    </td>
+  </tr>
+</table>
+
+
+
+
+
+{% endblock %}
