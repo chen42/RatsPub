@@ -370,8 +370,16 @@ def search():
 def tableview():
     with open("json_nodes.txt") as jsonfile:
         jnodes = json.load(jsonfile)
-    with open("json_edges.txt") as edgesjsonfile:
-        jedges = json.load(edgesjsonfile)
+    jedges =''
+    file_edges = open('json_edges.txt', 'r')
+    for line in file_edges.readlines():
+        if ':' not in line:
+            nodata_temp = 1
+        else: 
+            nodata_temp = 0
+            with open("json_edges.txt") as edgesjsonfile:
+                jedges = json.load(edgesjsonfile)
+            break
     genename=session['query'] 
     if len(genename)>3:
         genename = genename[0:3]
@@ -384,14 +392,22 @@ def tableview():
     gene_name = gene_name+added
     num_gene = gene_name.count(',')+1
     message3="<b> Notes: </b><li> Click on the abstract count to read sentences linking the keyword and the gene. <li> Click on a gene to search its relations with top 200 addiction genes. <li> Click on a keyword to see the terms included in the search. <li>View the results in <a href='cytoscape'><b> a graph.</b></a>"
-    return render_template('tableview.html', num_gene=num_gene,session_path = session['path'], jedges=jedges, jnodes=jnodes,gene_name=gene_name, message3=message3)
+    return render_template('tableview.html', nodata_temp=nodata_temp, num_gene=num_gene,session_path = session['path'], jedges=jedges, jnodes=jnodes,gene_name=gene_name, message3=message3)
 
 @app.route("/tableview0")
 def tableview0():
     with open("json_nodes.txt") as jsonfile:
         jnodes = json.load(jsonfile)
-    with open("json_edges.txt") as edgesjsonfile:
-        jedges = json.load(edgesjsonfile)
+    jedges =''
+    file_edges = open('json_edges.txt', 'r')
+    for line in file_edges.readlines():
+        if ':' not in line:
+            nodata_temp = 1
+        else: 
+            nodata_temp = 0
+            with open("json_edges.txt") as edgesjsonfile:
+                jedges = json.load(edgesjsonfile)
+            break
     genename=session['query'] 
     if len(genename)>3:
         genename = genename[0:3]
@@ -403,8 +419,8 @@ def tableview0():
     gene_name=gene_name.replace("'","")
     gene_name = gene_name+added
     num_gene = gene_name.count(',')+1
-    message4="<b> Notes: </b><li> These are the words that have <b>zero</b> abstract counts. <li>View all the results in <a href='cytoscape'><b> a graph.</b></a>"
-    return render_template('tableview0.html', num_gene=num_gene,session_path = session['path'], jedges=jedges, jnodes=jnodes,gene_name=gene_name, message4=message4)
+    message4="<b> Notes: </b><li> These are the keywords that have <b>zero</b> abstract counts. <li>View all the results in <a href='cytoscape'><b> a graph.</b></a>"
+    return render_template('tableview0.html',nodata_temp=nodata_temp, num_gene=num_gene,session_path = session['path'], jedges=jedges, jnodes=jnodes,gene_name=gene_name, message4=message4)
 
 @app.route("/userarchive")
 def userarchive():
@@ -452,6 +468,7 @@ def date():
     if ('email' in session):
         time_extension = str(select_date)
         time_extension = time_extension.split('_0_')[0]
+        gene_name1 = str(select_date).split('_0_')[1]
         time_extension = time_extension.replace(':', '_')
         time_extension = time_extension.replace('-', '_')
         session['path'] = tf_path+"/"+str(session['email'])+"/"+select_date+"/"+time_extension
@@ -469,24 +486,41 @@ def date():
                 temp_file.write(line) 
     with open("json_nodes.txt", "r") as jsonfile:
         jnodes = json.load(jsonfile)
-    with open("json_edges.txt", "r") as edgesjsonfile:
-        jedges = json.load(edgesjsonfile)
+
+    jedges =''
+    file_edges = open('json_edges.txt', 'r')
+    for line in file_edges.readlines():
+        if ':' not in line:
+            nodata_temp = 1
+        else: 
+            nodata_temp = 0
+            with open("json_edges.txt") as edgesjsonfile:
+                jedges = json.load(edgesjsonfile)
+            break
     gene_list=[]
-    for p in jedges['data']:
-        if p['source'] not in gene_list:
-            gene_list.append(p['source'])
-    if len(gene_list)>3:
-        gene_list = gene_list[0:3]
-        added = ",..."
-    else:
-        added = ""
-    gene_name = str(gene_list)[1:]
-    gene_name=gene_name[:-1]
-    gene_name=gene_name.replace("'","")
-    gene_name = gene_name+added
-    num_gene = gene_name.count(',')+1
+    if nodata_temp == 0:
+        for p in jedges['data']:
+            if p['source'] not in gene_list:
+                gene_list.append(p['source'])
+        if len(gene_list)>3:
+            gene_list = gene_list[0:3]
+            added = ",..."
+        else:
+            added = ""
+        gene_name = str(gene_list)[1:]
+        gene_name=gene_name[:-1]
+        gene_name=gene_name.replace("'","")
+        gene_name = gene_name+added
+        num_gene = gene_name.count(',')+1
+    else: 
+        gene_name1 = gene_name1.replace("_", ", ")
+        gene_name = gene_name1
+        num_gene = gene_name1.count(',')+1
+        for i in range(0,num_gene):
+            gene_list.append(gene_name1.split(',')[i])
+    session['query'] = gene_list
     message3="<b> Notes: </b><li>Click on the keywords to see the indicated number of abstracts <li> Click on a gene to search its relations with top 200 addiction genes<li>Click on a keyword to see the terms included in the search<li>Hover your pointer over a node will hide other links <li>Nodes can be moved around for better visibility, reload the page will restore the original layout<li> View the results in <a href='cytoscape'><b>a graph.</b></a>"
-    return render_template('tableview.html', title='', date=select_date, num_gene=num_gene,session_path = session['path'], jedges=jedges, jnodes=jnodes,gene_name=gene_name, message3=message3)
+    return render_template('tableview.html', title='',nodata_temp=nodata_temp, date=select_date, num_gene=num_gene,session_path = session['path'], jedges=jedges, jnodes=jnodes,gene_name=gene_name, message3=message3)
 
 @app.route('/cytoscape')
 def cytoscape():
@@ -515,7 +549,7 @@ def sentences():
                out3+= "<li> "+ text + " <a href=\"https://www.ncbi.nlm.nih.gov/pubmed/?term=" + pmid +"\" target=_new>PMID:"+pmid+"<br></a>"
                pmid_temp = pmid
                pmid_list.append(pmid+cat0)
-    out1="<h3>"+gene0 + " and " + cat0  + "</h3><hr>\n"
+    out1="<h3>"+gene0 + " and " + cat0  + "</h3>\n"
     if len(pmid_list)>1:
         out2 = str(len(pmid_list)) + ' sentences in ' + str(len(pmid_list)) + ' studies' "<hr>\n"
     else:

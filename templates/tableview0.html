@@ -2,14 +2,14 @@
 {% block content %}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.6.0/cytoscape.min.js" integrity="sha256-uZV2wRlscgr52q3Wb3Oew0rKCPsM3g4aBTv46sF4qzg=" crossorigin="anonymous"></script>
+
 <head>
     {%if num_gene==1%}
-        <h2> <b>GENE(S): {{gene_name}}</b> </h2>
+        <h2> <b>GENE:  {{gene_name}}</b> </h2>
     {%else%}
     <h2> <b>GENES: {{gene_name}}</b> </h2>
     {%endif%}
 </head>
-
 <style>
     * {
       box-sizing: border-box;
@@ -70,12 +70,13 @@
         var x=document.getElementById('myTable').insertRow(1);
         
         control=0;
-        {%for p1 in jedges['data']%}
-            {%if p1['target'] == p['id']%}
-                control=1
-            {%endif%}
-        {%endfor%}
-
+        {%if nodata_temp!=1%}
+          {%for p1 in jedges['data']%}
+              {%if p1['target'] == p['id']%}
+                  control=1
+              {%endif%}
+          {%endfor%}
+        {%endif%}
         if(control !=1){
             y= x.insertCell(0);
             y.innerHTML='{{p['id']}}'; 

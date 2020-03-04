@@ -4,12 +4,18 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.6.0/cytoscape.min.js" integrity="sha256-uZV2wRlscgr52q3Wb3Oew0rKCPsM3g4aBTv46sF4qzg=" crossorigin="anonymous"></script>
 <head>
     {%if num_gene==1%}
-        <h2> <b>GENE(S): {{gene_name}}</b> </h2>
+        <h2> <b>GENE: {{gene_name}}</b> </h2>
+        {%if nodata_temp==1%}
+            <b>No result was found.</b>
+        {%endif%}
     {%else%}
     <h2> <b>GENES: {{gene_name}}</b> </h2>
+        {%if nodata_temp==1%}
+            <b>No result was found.</b>
+        {%endif%}
     {%endif%}
 </head>
-
+{%if nodata_temp!=1%}
 <style>
     * {
       box-sizing: border-box;
@@ -53,54 +59,54 @@
         {{ message3 |safe}} 
     </div>
 </div>
-
-<script>{
-    {}   
-    var table = document.getElementById("myTable");
-    var header = table.createTHead();
-    var row = header.insertRow(0);    
-    var cell = row.insertCell(0);
-    cell.innerHTML = "<b>Gene</b>";
-    var cell = row.insertCell(1);
-    cell.innerHTML = "<b>Abstract Count</b>";
-    var cell = row.insertCell(2);
-    cell.innerHTML = "<b>Keyword</b>";
-    var cell = row.insertCell(3);
-    cell.innerHTML = "<b>Category</b>";
-    
-    {%for p in jedges['data']%}
-        var x=document.getElementById('myTable').insertRow(1);
-        source = '{{p['source']}}';
-        target = '{{p['target']}}';
-        var y= x.insertCell(0);        
-        {%for p1 in jnodes['data']%}
-            {%if p['target'] == p1['id']%}
-                color='{{p1['nodecolor']}}'
-                type='{{p1['nodetype']}}'
+    <script>{
+        {}   
+        var table = document.getElementById("myTable");
+        var header = table.createTHead();
+        var row = header.insertRow(0);    
+        var cell = row.insertCell(0);
+        cell.innerHTML = "<b>Gene</b>";
+        var cell = row.insertCell(1);
+        cell.innerHTML = "<b>Abstract Count</b>";
+        var cell = row.insertCell(2);
+        cell.innerHTML = "<b>Keyword</b>";
+        var cell = row.insertCell(3);
+        cell.innerHTML = "<b>Category</b>";
+        
+        {%for p in jedges['data']%}
+            var x=document.getElementById('myTable').insertRow(1);
+            source = '{{p['source']}}';
+            target = '{{p['target']}}';
+            var y= x.insertCell(0);        
+            {%for p1 in jnodes['data']%}
+                {%if p['target'] == p1['id']%}
+                    color='{{p1['nodecolor']}}'
+                    type='{{p1['nodetype']}}'
+                {%endif%}
+            {%endfor%}
+            {%if 'GWAS' in  p['target']%}
+                color="#AEB6BF"
+                type='GWAS'
+                key_gwas = target.replace("_GWAS","")
+                    this_url1 = 'sentences?edgeID=gwas_addiction.tab|'+source+'|'+target;
+                    this_url2 = 'https://www.ebi.ac.uk/gwas/search?query='+key_gwas;
+                {%else%}
+                    this_url1 = 'sentences?edgeID='+'{{session_path}}'+'_snt|'+source+'|'+target;
+                    this_url2 = 'shownode?nodetype='+type+'&node='+target;
             {%endif%}
-        {%endfor%}
-        {%if 'GWAS' in  p['target']%}
-            color="#AEB6BF"
-            type='GWAS'
-            key_gwas = target.replace("_GWAS","")
-                this_url1 = 'sentences?edgeID=gwas_addiction.tab|'+source+'|'+target;
-                this_url2 = 'https://www.ebi.ac.uk/gwas/search?query='+key_gwas;
-            {%else%}
-                this_url1 = 'sentences?edgeID='+'{{session_path}}'+'_snt|'+source+'|'+target;
-                this_url2 = 'shownode?nodetype='+type+'&node='+target;
-        {%endif%}
-        genegene_url = '/startGeneGene?forTopGene='+source;
-        y.innerHTML="<a href='"+genegene_url+"'>{{p['source']}}</a>";
-        y= x.insertCell(1);
-        y.innerHTML="<center> <a href='"+this_url1+"'> {{p['sentCnt']}}</a> </center>"; 
-        y= x.insertCell(2);
-        y.innerHTML="<a href='"+this_url2+"'>{{p['target']}}</a>";
-        y= x.insertCell(3);
-        y.innerHTML=type; 
-    {% endfor %}
-}
-</script>
-
-<a href="/tableview0">Check</a> for searches that has <b>zero</b> abstract counts.
+            genegene_url = '/startGeneGene?forTopGene='+source;
+            y.innerHTML="<a href='"+genegene_url+"'>{{p['source']}}</a>";
+            y= x.insertCell(1);
+            y.innerHTML="<center> <a href='"+this_url1+"'> {{p['sentCnt']}}</a> </center>"; 
+            y= x.insertCell(2);
+            y.innerHTML="<a href='"+this_url2+"'>{{p['target']}}</a>";
+            y= x.insertCell(3);
+            y.innerHTML=type; 
+        {% endfor %}
+    }
+    </script>
+{%endif%}
+<br>
+<a href="/tableview0">Review</a> searches that have <b>zero</b> abstract counts.
 
 {%endblock%}
