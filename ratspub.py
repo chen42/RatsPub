@@ -56,38 +56,38 @@ def generate_nodes_json(nodes_d, nodetype):
     return(nodes_json0)
 
 def generate_edges(data, filename):
-    pmid_temp=0
+    pmid_list=[]
     json0=str()
     edgeCnts={}
     for line in  data.split("\n"):
         if len(line.strip())!=0:
             (source, cat, target, pmid, sent) = line.split("\t")
             edgeID=filename+"|"+source+"|"+target
-            if (edgeID in edgeCnts) and (pmid != pmid_temp):
+            if (edgeID in edgeCnts) and (pmid+target not in pmid_list):
                 edgeCnts[edgeID]+=1
-                pmid_temp = pmid
-            elif (edgeID not in edgeCnts):
+                pmid_list.append(pmid+target)
+            elif (edgeID not in edgeCnts) and (pmid+target not in pmid_list):
                 edgeCnts[edgeID]=1
-                pmid_temp = pmid
+                pmid_list.append(pmid+target)
     for edgeID in edgeCnts:
         (filename, source,target)=edgeID.split("|")
         json0+="{ data: { id: '" + edgeID + "', source: '" + source + "', target: '" + target + "', sentCnt: " + str(edgeCnts[edgeID]) + ",  url:'/sentences?edgeID=" + edgeID + "' } },\n"
     return(json0)
 
 def generate_edges_json(data, filename):
-    pmid_temp=0
+    pmid_list=[]
     edges_json0=str()
     edgeCnts={}
     for line in  data.split("\n"):
         if len(line.strip())!=0:
             (source, cat, target, pmid, sent) = line.split("\t")
             edgeID=filename+"|"+source+"|"+target
-            if (edgeID in edgeCnts) and (pmid != pmid_temp):
+            if (edgeID in edgeCnts) and (pmid+target not in pmid_list):
                 edgeCnts[edgeID]+=1
-                pmid_temp = pmid
-            elif (edgeID not in edgeCnts):
+                pmid_list.append(pmid+target)
+            elif (edgeID not in edgeCnts) and (pmid+target not in pmid_list):
                 edgeCnts[edgeID]=1
-                pmid_temp = pmid
+                pmid_list.append(pmid+target)
     for edgeID in edgeCnts:
         (filename, source,target)=edgeID.split("|")
         edges_json0+="{ \"id\": \"" + edgeID + "\", \"source\": \"" + source + "\", \"target\": \"" + target + "\", \"sentCnt\": \"" + str(edgeCnts[edgeID]) + "\",  \"url\":\"/sentences?edgeID=" + edgeID + "\" },\n"
@@ -160,6 +160,10 @@ nj4=generate_nodes_json(stress_d, 'stress')
 nj5=generate_nodes_json(psychiatric_d, 'psychiatric')
 nj6=generate_nodes_json(psychiatric_d, 'GWAS')
 
+
+pubmed_path="~/Dropbox/ChenLab/Hakan/RatsPub/PubMed/Archive"
+
+'''
 host= os.popen('hostname').read().strip()
 if host=="x1":
     pubmed_path="/run/media/hao/PubMed/Archive/"
@@ -167,3 +171,4 @@ elif host=="hchen3":
     pubmed_path="/media/hao/2d554499-6c5b-462d-85f3-5c49b25f4ac8/PubMed/Archive"
 elif host=="penguin2":
     pubmed_path="/export2/PubMed/Archive"
+'''

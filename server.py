@@ -535,7 +535,6 @@ def cytoscape():
 
 @app.route("/sentences")
 def sentences():
-    pmid_temp=""
     pmid_list=[]
     edge=request.args.get('edgeID')
     (tf_name, gene0, cat0)=edge.split("|")
@@ -547,7 +546,6 @@ def sentences():
            (gene,nouse,cat, pmid, text)=sent.split("\t")
            if (gene.upper() == gene0.upper() and cat.upper() == cat0.upper() and (pmid+cat0 not in pmid_list)) :
                out3+= "<li> "+ text + " <a href=\"https://www.ncbi.nlm.nih.gov/pubmed/?term=" + pmid +"\" target=_new>PMID:"+pmid+"<br></a>"
-               pmid_temp = pmid
                pmid_list.append(pmid+cat0)
     out1="<h3>"+gene0 + " and " + cat0  + "</h3>\n"
     if len(pmid_list)>1:
