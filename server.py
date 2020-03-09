@@ -58,7 +58,7 @@ def signup():
         password = request.form['password']
         found_user = users.query.filter_by(email=email).first()
         if (found_user and (bcrypt.checkpw(password.encode('utf8'), found_user.password)==False)):
-            flash(f"Already registered, but wrong password!", "loginout")
+            flash("Already registered, but wrong password!", "loginout")
             return render_template('signup.html')        
         session['email'] = email
         session['name'] = name
@@ -74,7 +74,7 @@ def signup():
             db.session.commit()
             newuser = users.query.filter_by(email=session['email']).first()
             session['id'] = newuser.id
-        flash(f"Login Succesful!", "loginout")
+        flash("Login Succesful!", "loginout")
         return render_template('index.html')
     else:
         if 'email' in session:
@@ -93,10 +93,10 @@ def signin():
             session['email'] = found_user.email
             session['name'] = found_user.name
             session['id'] = found_user.id
-            flash(f"Login Succesful!", "loginout")
+            flash("Login Succesful!", "loginout")
             return render_template('index.html')
         else:
-            flash(f"Invalid username or password!", "loginout")
+            flash("Invalid username or password!", "loginout")
             return render_template('signup.html')   
     return render_template('signin.html')
 
@@ -117,7 +117,7 @@ def profile(nm_passwd):
                 password = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
                 found_user.password = password
                 db.session.commit()
-                flash(f"Your password is changed!", "loginout")
+                flash("Your password is changed!", "loginout")
                 return render_template('index.html')
             # remove reserved characters from the hashed passwords
             reserved = (";", "/", "?", ":", "@", "=", "&", ".")
@@ -143,7 +143,7 @@ def logout():
             user1 = session['name']
         else: 
             user1 = session['email']
-    flash(f"You have been logged out, {user1}", "loginout")
+    flash("You have been logged out, {user1}", "loginout")
     session.pop('email', None)
     session.clear()
     return render_template('index.html')
@@ -664,4 +664,4 @@ def top150genes():
 
 if __name__ == '__main__':
     db.create_all()
-    app.run(debug=True, port=4200)
+    app.run(debug=True, port=4201)
