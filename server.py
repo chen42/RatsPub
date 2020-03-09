@@ -539,19 +539,22 @@ def sentences():
     edge=request.args.get('edgeID')
     (tf_name, gene0, cat0)=edge.split("|")
     out3=""
+    num_abstract = 0
     with open(tf_name, "r") as df:
         all_sents=df.read()
     for sent in all_sents.split("\n"):
         if len(sent.strip())!=0:
-           (gene,nouse,cat, pmid, text)=sent.split("\t")
-           if (gene.upper() == gene0.upper() and cat.upper() == cat0.upper() and (pmid+cat0 not in pmid_list)) :
-               out3+= "<li> "+ text + " <a href=\"https://www.ncbi.nlm.nih.gov/pubmed/?term=" + pmid +"\" target=_new>PMID:"+pmid+"<br></a>"
-               pmid_list.append(pmid+cat0)
+            (gene,nouse,cat, pmid, text)=sent.split("\t")
+            if (gene.upper() == gene0.upper() and cat.upper() == cat0.upper()) :
+                out3+= "<li> "+ text + " <a href=\"https://www.ncbi.nlm.nih.gov/pubmed/?term=" + pmid +"\" target=_new>PMID:"+pmid+"<br></a>"
+                num_abstract += 1
+                if(pmid+cat0 not in pmid_list):
+                    pmid_list.append(pmid+cat0)
     out1="<h3>"+gene0 + " and " + cat0  + "</h3>\n"
     if len(pmid_list)>1:
-        out2 = str(len(pmid_list)) + ' sentences in ' + str(len(pmid_list)) + ' studies' "<hr>\n"
+        out2 = str(num_abstract) + ' sentences in ' + str(len(pmid_list)) + ' studies' "<hr>\n"
     else:
-        out2 = str(len(pmid_list)) + ' sentence in ' + str(len(pmid_list)) + ' study' "<hr>\n"
+        out2 = str(num_abstract) + ' sentence in ' + str(len(pmid_list)) + ' study' "<hr>\n"
     out= out1+ out2 +out3
     return render_template('sentences.html', sentences="<ol>"+out+"</ol><p>")
 
