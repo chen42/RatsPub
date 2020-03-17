@@ -19,6 +19,7 @@ app=Flask(__name__)
 app.config['SECRET_KEY'] = '#DtfrL98G5t1dC*4'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///userspub.sqlite'
 db = SQLAlchemy(app)
+datadir="/export/ratspub/"
 
 # the sqlite database
 class users(db.Model):
