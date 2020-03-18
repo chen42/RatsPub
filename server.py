@@ -16,10 +16,10 @@ import re
 import pytz
 
 app=Flask(__name__)
-app.config['SECRET_KEY'] = '#DtfrL98G5t1dC*4'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///userspub.sqlite'
-db = SQLAlchemy(app)
 datadir="/export/ratspub/"
+app.config['SECRET_KEY'] = '#DtfrL98G5t1dC*4'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+datadir+'userspub.sqlite'
+db = SQLAlchemy(app)
 
 # the sqlite database
 class users(db.Model):
@@ -209,10 +209,10 @@ def search():
     #create a folder for the search
     if ('email' in session):
         user_login=1
-        os.makedirs("./user/"+str(session['email']+"/"+timeextension+"_0_"+genes_for_folder_name+marker),exist_ok=True)
-        session['user_folder'] = "./user/"+str(session['email'])
+        os.makedirs(datadir+"user/"+str(session['email']+"/"+timeextension+"_0_"+genes_for_folder_name+marker),exist_ok=True)
+        session['user_folder'] = datadir+"user/"+str(session['email'])
         user_folder=session['user_folder']
-        session['path'] = "./user/"+str(session['email'])+"/"+timeextension+"_0_"+genes_for_folder_name+marker+"/"+timeextension
+        session['path'] = datadir+"user/"+str(session['email'])+"/"+timeextension+"_0_"+genes_for_folder_name+marker+"/"+timeextension
     percent=round(100/(len(genes)*6),1) # 6 categories 
     snt_file=session['path']+"_snt"
     cysdata=open(session['path']+"_cy","w+")
@@ -351,34 +351,34 @@ def search():
         json_edges = json_edges[:-2]
         json_edges =json_edges+"]}"
         #write edges to txt file in json format
-        with open("json_edges.txt", 'w') as edgesjson:
+        with open(datadir+"edges.json", 'w') as edgesjson:
             edgesjson.write(json_edges) 
         #write edges to txt file in json format also in user folder
         if (user_login == 1):
-            with open(user_folder+"/"+timeextension+"_0_"+genes_for_folder_name+marker+"/json_edges.txt", "w") as temp_file_edges:
+            with open(user_folder+"/"+timeextension+"_0_"+genes_for_folder_name+marker+"/edges.json", "w") as temp_file_edges:
                 temp_file_edges.write(json_edges)       
     #write nodes to txt file in json format
-    with open("json_nodes.txt", 'w') as nodesjson:
+    with open(datadir+"nodes.json", 'w') as nodesjson:
         #if (userlogin) == 1:             
         nodesjson.write(json_nodes)
     #write nodes to txt file in json format also in user folder
     if ('email' in session):
-        with open("./user/"+str(session['email'])+"/"+timeextension+"_0_"+genes_for_folder_name+marker+"/json_nodes.txt", "w") as temp_file_nodes:
+        with open(datadir+"user/"+str(session['email'])+"/"+timeextension+"_0_"+genes_for_folder_name+marker+"/nodes.json", "w") as temp_file_nodes:
             temp_file_nodes.write(json_nodes)
     return Response(generate(genes, snt_file), mimetype='text/event-stream')
 
 @app.route("/tableview")
 def tableview():
-    with open("json_nodes.txt") as jsonfile:
+    with open(datadir+"nodes.json") as jsonfile:
         jnodes = json.load(jsonfile)
     jedges =''
-    file_edges = open('json_edges.txt', 'r')
+    file_edges = open(datadir+'edges.json', 'r')
     for line in file_edges.readlines():
         if ':' not in line:
             nodata_temp = 1
         else: 
             nodata_temp = 0
-            with open("json_edges.txt") as edgesjsonfile:
+            with open(datadir+"edges.json") as edgesjsonfile:
                 jedges = json.load(edgesjsonfile)
             break
     genename=session['query'] 
@@ -397,16 +397,16 @@ def tableview():
 
 @app.route("/tableview0")
 def tableview0():
-    with open("json_nodes.txt") as jsonfile:
+    with open(datadir+"nodes.json") as jsonfile:
         jnodes = json.load(jsonfile)
     jedges =''
-    file_edges = open('json_edges.txt', 'r')
+    file_edges = open(datadir+'edges.json', 'r')
     for line in file_edges.readlines():
         if ':' not in line:
             nodata_temp = 1
         else: 
             nodata_temp = 0
-            with open("json_edges.txt") as edgesjsonfile:
+            with open(datadir+"edges.json") as edgesjsonfile:
                 jedges = json.load(edgesjsonfile)
             break
     genename=session['query'] 
@@ -425,11 +425,11 @@ def tableview0():
 
 @app.route("/userarchive")
 def userarchive():
-    if os.path.exists("./user/"+str(session['email'])) == False:
+    if os.path.exists(datadir+"user/"+str(session['email'])) == False:
         flash("Search history doesn't exist!")
         return render_template('index.html')
     if ('email' in session):
-        session['user_folder'] = "./user/"+str(session['email'])
+        session['user_folder'] = datadir+"user/"+str(session['email'])
     session_id=session['id']
     def sorted_alphanumeric(data):
         convert = lambda text: int(text) if text.isdigit() else text.lower()
@@ -458,14 +458,14 @@ def userarchive():
 @app.route('/remove', methods=['GET', 'POST'])
 def remove():
     remove_folder = request.args.get('remove_folder')
-    shutil.rmtree("./user/"+str(session['email']+"/"+remove_folder), ignore_errors=True)
+    shutil.rmtree(datadir+"user/"+str(session['email']+"/"+remove_folder), ignore_errors=True)
     return redirect(url_for('userarchive'))
 
 @app.route('/date', methods=['GET', 'POST'])
 def date():
     select_date = request.args.get('selected_date')
     #open the cache folder for the user
-    tf_path="./user"
+    tf_path=datadir+"user"
     if ('email' in session):
         time_extension = str(select_date)
         time_extension = time_extension.split('_0_')[0]
@@ -477,25 +477,25 @@ def date():
     else:
         tf_path=tempfile.gettempdir()
         session['path']=tf_path+"/tmp" + ''.join(random.choice(string.ascii_letters) for x in range(6)) 
-    with open(tf_path+"/"+str(session['email'])+"/"+select_date+"/json_edges.txt", "r") as archive_file:
-        with open("json_edges.txt", "w") as temp_file:
+    with open(tf_path+"/"+str(session['email'])+"/"+select_date+"/edges.json", "r") as archive_file:
+        with open(datadir+"edges.json", "w") as temp_file:
             for line in archive_file:
                 temp_file.write(line)        
-    with open(tf_path+"/"+str(session['email'])+"/"+select_date+"/json_nodes.txt", "r") as archive_file:
-        with open("json_nodes.txt", "w") as temp_file:
+    with open(tf_path+"/"+str(session['email'])+"/"+select_date+"/nodes.json", "r") as archive_file:
+        with open(datadir+"nodes.json", "w") as temp_file:
             for line in archive_file:
                 temp_file.write(line) 
-    with open("json_nodes.txt", "r") as jsonfile:
+    with open(datadir+"nodes.json", "r") as jsonfile:
         jnodes = json.load(jsonfile)
 
     jedges =''
-    file_edges = open('json_edges.txt', 'r')
+    file_edges = open(datadir+'edges.json', 'r')
     for line in file_edges.readlines():
         if ':' not in line:
             nodata_temp = 1
         else: 
             nodata_temp = 0
-            with open("json_edges.txt") as edgesjsonfile:
+            with open(datadir+"edges.json") as edgesjsonfile:
                 jedges = json.load(edgesjsonfile)
             break
     gene_list=[]
@@ -665,4 +665,4 @@ def top150genes():
 
 if __name__ == '__main__':
     db.create_all()
-    app.run(debug=True, port=4206)
+    app.run(debug=True, port=4200)
