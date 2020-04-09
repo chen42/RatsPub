@@ -10,6 +10,7 @@ import tempfile
 import random
 import string
 from ratspub import *
+from nlp import *
 import time
 import os
 import re
@@ -540,6 +541,10 @@ def sentences():
     edge=request.args.get('edgeID')
     (tf_name, gene0, cat0)=edge.split("|")
     out3=""
+    out5_pl=""
+    out5_sn=""
+    out_pos = ""
+    out_neg = ""
     num_abstract = 0
     with open(tf_name, "r") as df:
         all_sents=df.read()
@@ -550,13 +555,37 @@ def sentences():
                 out3+= "<li> "+ text + " <a href=\"https://www.ncbi.nlm.nih.gov/pubmed/?term=" + pmid +"\" target=_new>PMID:"+pmid+"<br></a>"
                 num_abstract += 1
                 if(pmid+cat0 not in pmid_list):
-                    pmid_list.append(pmid+cat0)
+                    pmid_list.append(pmid+cat0)                
+                if(cat0=='stress'):
+                    out5_pl = 'These are analyzed by deep learning to seperate the relevant sentences.'
+                    out5_sn = 'This is analyzed by deep learning to see whether it is relevant or not.'
+                    out_pred = "<li> "+ text + " <a href=\"https://www.ncbi.nlm.nih.gov/pubmed/?term=" + pmid +"\" target=_new>PMID:"+pmid+"<br></a>"
+                    out4 = predict_sent(out_pred)
+                    if(out4 == 'pos'):
+                        out_rel = "<b>Relevant sentences:</b>"
+                        out_pos += out_pred
+                    else:
+                        out_irrel = "<br><br><br><hr>"+"<b>Irrelevant sentences:</b>"
+                        out_neg += out_pred
     out1="<h3>"+gene0 + " and " + cat0  + "</h3>\n"
     if len(pmid_list)>1:
-        out2 = str(num_abstract) + ' sentences in ' + str(len(pmid_list)) + ' studies' "<hr>\n"
+        out2 = str(num_abstract) + ' sentences in ' + str(len(pmid_list)) + ' studies' + "<br>"
+        if(out5_pl!=""):
+            out2 += out5_pl
+        out2 += "<hr>\n"
     else:
-        out2 = str(num_abstract) + ' sentence in ' + str(len(pmid_list)) + ' study' "<hr>\n"
-    out= out1+ out2 +out3
+        out2 = str(num_abstract) + ' sentence in ' + str(len(pmid_list)) + ' study' "<br>"
+        if(out5_sn!=""):
+            out2 += out5_sn    
+        out2 += "<hr>\n"  
+    if(out_neg == "" and out_pos == ""):
+        out= out1+ out2 +out3
+    elif(out_pos != "" and out_neg!=""):
+        out = out1 + out2 + out_rel+out_pos + out_irrel + out_neg
+    elif(out_pos != "" and out_neg ==""):
+        out= out1+ out2 + out_rel + out_pos
+    elif(out_neg != "" and out_pos == ""):
+        out = out1 +out2+out_irrel+out_neg
     return render_template('sentences.html', sentences="<ol>"+out+"</ol><p>")
 
 ## show the cytoscape graph for one gene from the top gene list
