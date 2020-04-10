@@ -48,18 +48,23 @@ with open('./nlp/vocabulary.txt', 'r') as vocab:
     vocab = vocab.read()
 
 # create the CNN model
-def create_model(vocab_size, max_length):
-    model = Sequential()
-    model.add(Embedding(vocab_size, 32, input_length=max_length))
-    model.add(Conv1D(filters=16, kernel_size=4, activation='relu'))
-    model.add(MaxPooling1D(pool_size=2))
-    model.add(Flatten())
-    model.add(Dense(10, activation='relu'))
-    model.add(Dense(1, activation='sigmoid'))
-    opt = keras.optimizers.Adamax(learning_rate=0.002, beta_1=0.9, beta_2=0.999)
+#def create_model(vocab_size, max_length):
+model = Sequential()
+model.add(Embedding(vocab_size, 32, input_length=max_length))
+model.add(Conv1D(filters=16, kernel_size=4, activation='relu'))
+model.add(MaxPooling1D(pool_size=2))
+model.add(Flatten())
+model.add(Dense(10, activation='relu'))
+model.add(Dense(1, activation='sigmoid'))
+opt = keras.optimizers.Adamax(learning_rate=0.002, beta_1=0.9, beta_2=0.999)
+model.compile(loss='binary_crossentropy', optimizer=opt, metrics=[keras.metrics.AUC()])
+model = create_model(23154, 64)
+# load the weights
+## this is done for every prediction??
+checkpoint_path = "./nlp/weights.ckpt"
+model.load_weights(checkpoint_path)
 
-    model.compile(loss='binary_crossentropy', optimizer=opt, metrics=[keras.metrics.AUC()])
-    return model
+#return model
 
 def predict_sent(sent_for_pred):
     max_length = 64
@@ -70,10 +75,6 @@ def predict_sent(sent_for_pred):
     line = [line]
     tokenized_sent = tokenizer.texts_to_sequences(line)
     tokenized_sent = pad_sequences(tokenized_sent, maxlen=max_length, padding='post')
-    model = create_model(23154, 64)
-    # load the weights
-    checkpoint_path = "./nlp/weights.ckpt"
-    model.load_weights(checkpoint_path)
     predict_sent = model.predict(tokenized_sent, verbose=0)
     percent_sent = predict_sent[0,0]
     if round(percent_sent) == 0:
