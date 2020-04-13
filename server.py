@@ -10,11 +10,35 @@ import tempfile
 import random
 import string
 from ratspub import *
-from nlp import *
 import time
 import os
 import re
 import pytz
+
+
+import string
+import re
+import os
+from os import listdir
+from nltk.corpus import stopwords
+from nltk.stem.porter import PorterStemmer
+from collections import Counter
+import numpy as np
+from numpy import array
+import keras
+from keras.models import Model
+from keras.preprocessing.text import Tokenizer
+from keras.preprocessing.sequence import pad_sequences
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.layers import Flatten
+from keras.layers import Embedding
+from keras.layers.convolutional import Conv1D
+from keras.layers.convolutional import MaxPooling1D
+from keras import metrics
+from keras import optimizers
+import pickle
+import tensorflow as tf 
 
 app=Flask(__name__)
 datadir="/export/ratspub/"
@@ -30,6 +54,39 @@ class users(db.Model):
     email = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
+
+def clean_doc(doc, vocab):
+    doc = doc.lower()
+    tokens = doc.split()
+    re_punc = re.compile('[%s]' % re.escape(string.punctuation))    
+    tokens = [re_punc.sub('' , w) for w in tokens]    
+    tokens = [word for word in tokens if len(word) > 1]
+    stop_words = set(stopwords.words('english'))
+    tokens = [w for w in tokens if not w in stop_words]
+    porter = PorterStemmer()
+    stemmed = [porter.stem(word) for word in tokens]
+    return tokens
+
+# load tokenizer
+with open('./nlp/tokenizer.pickle', 'rb') as handle:
+    tokenizer = pickle.load(handle)
+
+# load vocabulary
+with open('./nlp/vocabulary.txt', 'r') as vocab:
+    vocab = vocab.read()
+
+# create the CNN model
+def create_model(vocab_size, max_length):
+    model = Sequential()
+    model.add(Embedding(vocab_size, 32, input_length=max_length))
+    model.add(Conv1D(filters=16, kernel_size=4, activation='relu'))
+    model.add(MaxPooling1D(pool_size=2))
+    model.add(Flatten())
+    model.add(Dense(10, activation='relu'))
+    model.add(Dense(1, activation='sigmoid'))
+    opt = keras.optimizers.Adamax(learning_rate=0.002, beta_1=0.9, beta_2=0.999)
+    model.compile(loss='binary_crossentropy', optimizer=opt, metrics=[keras.metrics.AUC()])
+    return model
 
 @app.route("/")
 def root():
@@ -537,18 +594,33 @@ def cytoscape():
 
 @app.route("/sentences")
 def sentences():
+    def predict_sent(sent_for_pred):
+        max_length = 64
+        tokens = clean_doc(sent_for_pred, vocab)
+        tokens = [w for w in tokens if w in vocab]
+        # convert to line
+        line = ' '.join(tokens)
+        line = [line]
+        tokenized_sent = tokenizer.texts_to_sequences(line)
+        tokenized_sent = pad_sequences(tokenized_sent, maxlen=max_length, padding='post')        
+        predict_sent = model.predict(tokenized_sent, verbose=0)
+        percent_sent = predict_sent[0,0]
+        if round(percent_sent) == 0:
+            return 'neg'
+        else:
+            return 'pos'
     pmid_list=[]
     edge=request.args.get('edgeID')
     (tf_name, gene0, cat0)=edge.split("|")
+    if(cat0=='stress'):
+        model = create_model(23154, 64)
+        model.load_weights("./nlp/weights.ckpt")
     out3=""
-#    out5_pl=""
-#    out5_sn=""
     out_pos = ""
     out_neg = ""
     num_abstract = 0
-    stress_systemic = "<br><br><br><hr>"+"<b>Sentence(s) describing celluar stress (classified using a deep learning model):</b>"
-    stress_cellular = "<b>Sentence(s) describing systemic stress (classified using a deep learning model):</b>"
-    stress_sents={}
+    stress_cellular = "<br><br><br>"+"<b>Sentence(s) describing celluar stress (classified using a deep learning model):</b><hr>"
+    stress_systemic = "<b>Sentence(s) describing systemic stress (classified using a deep learning model):</b><hr>"
     with open(tf_name, "r") as df:
         all_sents=df.read()
     for sent in all_sents.split("\n"):
@@ -560,39 +632,26 @@ def sentences():
                 if(pmid+cat0 not in pmid_list):
                     pmid_list.append(pmid+cat0)
                 if(cat0=='stress'):
-#                    out5_pl = 'These are analyzed by deep learning to seperate the relevant sentences.'
-#                    out5_sn = 'This is analyzed by deep learning to see whether it is relevant or not.'
-                    out_pred = "<li> "+ text + " <a href=\"https://www.ncbi.nlm.nih.gov/pubmed/?term=" + pmid +"\" target=_new>PMID:"+pmid+"<br></a>"
-                    #should we add the html part after the predict_sent function?
-                    out4 = predict_sent(out_pred)
-                    stress_sents[out4] +=stress_sents[out4]
-#                    stress_sents["pos"]+=stress_sents["pos"]
-#                    stress_sents["neg"]+=stress_sents["neg"]
-#                    if(out4 == 'pos'):
-#                        out_pos += out_pred
-#                    else:
-#                        out_neg += out_pred
+                    out_pred = "<li> "+ text + " <a href=\"https://www.ncbi.nlm.nih.gov/pubmed/?term=" + pmid +"\" target=_new>PMID:"+pmid+"<br></a>"                    
+                    out4 = predict_sent(text)
+                    if(out4 == 'pos'):
+                        out_pos += out_pred
+                    else:
+                        out_neg += out_pred
     out1="<h3>"+gene0 + " and " + cat0  + "</h3>\n"
     if len(pmid_list)>1:
-        out2 = str(num_abstract) + ' sentences in ' + str(len(pmid_list)) + ' studies' + "<br>"
-#        if(out5_pl!=""):
-#            out2 += out5_pl
-        out2 += "<hr>\n"
+        out2 = str(num_abstract) + ' sentences in ' + str(len(pmid_list)) + ' studies' + "<br><br>"
     else:
-        out2 = str(num_abstract) + ' sentence in ' + str(len(pmid_list)) + ' study' "<br>"
-#        if(out5_sn!=""):
-#            out2 += out5_sn
-        out2 += "<hr>\n"
+        out2 = str(num_abstract) + ' sentence(s) in ' + str(len(pmid_list)) + ' study' "<br><br>"
     if(out_neg == "" and out_pos == ""):
         out= out1+ out2 +out3
     elif(out_pos != "" and out_neg!=""):
-        out = out1 + out2 + out_rel+out_pos + out_irrel + out_neg
+        out = out1 + out2 + stress_systemic+out_pos + stress_cellular + out_neg
     elif(out_pos != "" and out_neg ==""):
-        out= out1+ out2 + out_rel + out_pos
+        out= out1+ out2 + stress_systemic + out_pos
     elif(out_neg != "" and out_pos == ""):
-        out = out1 +out2+out_irrel+out_neg
+        out = out1 +out2+stress_cellular+out_neg
     return render_template('sentences.html', sentences="<ol>"+out+"</ol><p>")
-
 ## show the cytoscape graph for one gene from the top gene list
 @app.route("/showTopGene")
 def showTopGene():
