@@ -25,20 +25,19 @@ from nltk.stem.porter import PorterStemmer
 from collections import Counter
 import numpy as np
 from numpy import array
+import tensorflow
 import keras
-from keras.models import Model
-from keras.preprocessing.text import Tokenizer
-from keras.preprocessing.sequence import pad_sequences
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.layers import Flatten
-from keras.layers import Embedding
-from keras.layers.convolutional import Conv1D
-from keras.layers.convolutional import MaxPooling1D
-from keras import metrics
-from keras import optimizers
+from tensorflow.keras.models import Model
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.layers import *
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Flatten
+from tensorflow.keras.layers import Embedding
+from tensorflow.keras import metrics
+from tensorflow.keras import optimizers
 import pickle
-import tensorflow as tf 
 
 app=Flask(__name__)
 datadir="/export/ratspub/"
@@ -84,8 +83,8 @@ def create_model(vocab_size, max_length):
     model.add(Flatten())
     model.add(Dense(10, activation='relu'))
     model.add(Dense(1, activation='sigmoid'))
-    opt = keras.optimizers.Adamax(learning_rate=0.002, beta_1=0.9, beta_2=0.999)
-    model.compile(loss='binary_crossentropy', optimizer=opt, metrics=[keras.metrics.AUC()])
+    opt = tensorflow.keras.optimizers.Adamax(learning_rate=0.002, beta_1=0.9, beta_2=0.999)
+    model.compile(loss='binary_crossentropy', optimizer=opt, metrics=[tensorflow.keras.metrics.AUC()])
     return model
 
 @app.route("/")
@@ -602,7 +601,7 @@ def sentences():
         line = ' '.join(tokens)
         line = [line]
         tokenized_sent = tokenizer.texts_to_sequences(line)
-        tokenized_sent = pad_sequences(tokenized_sent, maxlen=max_length, padding='post')        
+        tokenized_sent = pad_sequences(tokenized_sent, maxlen=max_length, padding='post') 
         predict_sent = model.predict(tokenized_sent, verbose=0)
         percent_sent = predict_sent[0,0]
         if round(percent_sent) == 0:
