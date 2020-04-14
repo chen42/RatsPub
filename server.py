@@ -616,7 +616,7 @@ def sentences():
     out_pos = ""
     out_neg = ""
     num_abstract = 0
-    stress_cellular = "<br><br><br>"+"<b>Sentence(s) describing celluar stress (classified using a deep learning model):</b><hr>"
+    stress_cellular = "<br><br><br>"+"</ol><b>Sentence(s) describing celluar stress (classified using a deep learning model):</b><hr><ol>"
     stress_systemic = "<b>Sentence(s) describing systemic stress (classified using a deep learning model):</b><hr>"
     with open(tf_name, "r") as df:
         all_sents=df.read()
@@ -629,12 +629,13 @@ def sentences():
                 if(pmid+cat0 not in pmid_list):
                     pmid_list.append(pmid+cat0)
                 if(cat0=='stress'):
-                    out_pred = "<li> "+ text + " <a href=\"https://www.ncbi.nlm.nih.gov/pubmed/?term=" + pmid +"\" target=_new>PMID:"+pmid+"<br></a>"                    
                     out4 = predict_sent(text)
                     if(out4 == 'pos'):
-                        out_pos += out_pred
+                        out_pred_pos = "<li> "+ text + " <a href=\"https://www.ncbi.nlm.nih.gov/pubmed/?term=" + pmid +"\" target=_new>PMID:"+pmid+"<br></a>"                    
+                        out_pos += out_pred_pos
                     else:
-                        out_neg += out_pred
+                        out_pred_neg = "<li>"+ text + " <a href=\"https://www.ncbi.nlm.nih.gov/pubmed/?term=" + pmid +"\" target=_new>PMID:"+pmid+"<br></a>"                    
+                        out_neg += out_pred_neg
     out1="<h3>"+gene0 + " and " + cat0  + "</h3>\n"
     if len(pmid_list)>1:
         out2 = str(num_abstract) + ' sentences in ' + str(len(pmid_list)) + ' studies' + "<br><br>"
