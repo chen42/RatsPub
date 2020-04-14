@@ -15,10 +15,6 @@ import os
 import re
 import pytz
 
-
-import string
-import re
-import os
 from os import listdir
 import nltk
 from nltk.corpus import stopwords
@@ -28,16 +24,16 @@ import numpy as np
 from numpy import array
 import tensorflow
 import keras
-from tensorflow.keras.models import Model
-from tensorflow.keras.preprocessing.text import Tokenizer
-from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras.layers import *
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.layers import Flatten
-from tensorflow.keras.layers import Embedding
-from tensorflow.keras import metrics
-from tensorflow.keras import optimizers
+from keras.models import Model
+from keras.preprocessing.text import Tokenizer
+from keras.preprocessing.sequence import pad_sequences
+from keras.layers import *
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.layers import Flatten
+from keras.layers import Embedding
+from keras import metrics
+from keras import optimizers
 import pickle
 
 app=Flask(__name__)
@@ -85,8 +81,8 @@ def create_model(vocab_size, max_length):
     model.add(Flatten())
     model.add(Dense(10, activation='relu'))
     model.add(Dense(1, activation='sigmoid'))
-    opt = tensorflow.keras.optimizers.Adamax(learning_rate=0.002, beta_1=0.9, beta_2=0.999)
-    model.compile(loss='binary_crossentropy', optimizer=opt, metrics=[tensorflow.keras.metrics.AUC()])
+    opt = keras.optimizers.Adamax(learning_rate=0.002, beta_1=0.9, beta_2=0.999)
+    model.compile(loss='binary_crossentropy', optimizer=opt, metrics=[keras.metrics.AUC()])
     return model
 
 @app.route("/")
