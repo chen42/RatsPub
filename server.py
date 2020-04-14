@@ -20,6 +20,7 @@ import string
 import re
 import os
 from os import listdir
+import nltk
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 from collections import Counter
@@ -44,6 +45,7 @@ datadir="/export/ratspub/"
 app.config['SECRET_KEY'] = '#DtfrL98G5t1dC*4'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+datadir+'userspub.sqlite'
 db = SQLAlchemy(app)
+nltk.data.path.append("./nlp/")
 
 # the sqlite database
 class users(db.Model):
