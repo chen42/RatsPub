@@ -8,13 +8,9 @@
     * Click==7.0
     * itsdangerous==1.1.0
     * Jinja2==2.10.3
-      * MarkupSafe
+      * MarkupSafe==1.0
     * Werkzeug==1.0.0
   * SQLAlchemy==1.3.12
-
-* nltk==3.4.5
-  * six==1.14.0
-
 
 * Keras==2.3.1
   * h5py==2.10.0
@@ -34,8 +30,10 @@
     * numpy==1.18.1
   * six==1.14.0
 
+* nltk==3.4.5
+  * six==1.14.0
 
-* tensorflow==2.1.0
+* tensorflow==1.14.0
   * absl-py==0.9.0
     * six==1.14.0
   * astor==0.8.1
@@ -53,41 +51,13 @@
     * numpy==1.18.1
     * six==1.14.0
   * numpy==1.18.1
-  * opt-einsum==3.2.0
-    * numpy==1.18.1
   * protobuf==3.11.3
     * setuptools==45.2.0
     * six==1.14.0
-  * scipy==1.4.1
-    * numpy==1.18.1
   * six==1.14.0
-  * tensorboard==2.1.1
+  * tensorboard==1.14.0
     * absl-py==0.9.0
       * six==1.14.0
-    * google-auth==1.13.1
-      * cachetools==4.1.0
-      * pyasn1-modules==0.2.8
-        * pyasn1==0.4.8
-      * rsa==4.0
-        * pyasn1==0.4.8
-      * setuptools==45.2.0
-      * six==1.14.0
-    * google-auth-oauthlib==0.4.1
-      * google-auth==1.13.1
-        * cachetools==4.1.0
-        * pyasn1-modules==0.2.8
-          * pyasn1==0.4.8
-        * rsa==4.0
-          * pyasn1==0.4.8
-        * setuptools==45.2.0
-        * six==1.14.0
-      * requests-oauthlib==1.3.0
-        * oauthlib==3.1.0
-        * requests==2.22.0
-          * certifi==2019.11.28
-          * chardet==3.0.4
-          * idna==2.8
-          * urllib3==1.25.8
     * grpcio==1.27.2
       * six==1.14.0
     * Markdown==3.2.1
@@ -96,18 +66,14 @@
     * protobuf==3.11.3
       * setuptools==45.2.0
       * six==1.14.0
-    * requests==2.22.0
-      * certifi==2019.11.28
-      * chardet==3.0.4
-      * idna==2.8
-      * urllib3==1.25.8
     * setuptools==45.2.0
     * six==1.14.0
     * Werkzeug==1.0.0
     * wheel==0.34.2
-  * tensorflow-estimator==2.1.0
+  * tensorflow-estimator==1.14.0
   * termcolor==1.1.0
   * wheel==0.34.2
   * wrapt==1.11.2
 
 * python==3.6.9
+
