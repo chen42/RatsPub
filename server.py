@@ -447,7 +447,7 @@ def tableview():
     gene_name=gene_name.replace("'","")
     gene_name = gene_name+added
     num_gene = gene_name.count(',')+1
-    message3="<b> Actions: </b><li> <font color=\"red\">Click on the abstract count to read sentences linking the keyword and the gene.</font> <li> Click on a gene to search its relations with top 200 addiction genes. <li> Click on a keyword to see the terms included in the search. <li>View the results in <a href='cytoscape'><b> a graph.</b></a>"
+    message3="<b> Actions: </b><li> <font color=\"#E74C3C\">Click on the abstract count to read sentences linking the keyword and the gene</font> <li> Click on a gene to search its relations with top 200 addiction genes. <li> Click on a keyword to see the terms included in the search. <li>View the results in <a href='cytoscape'><b> a graph.</b></a><li>All results will appear in a new Browser window (or tab)"
     return render_template('tableview.html', nodata_temp=nodata_temp, num_gene=num_gene,session_path = session['path'], jedges=jedges, jnodes=jnodes,gene_name=gene_name, message3=message3)
 
 @app.route("/tableview0")
@@ -575,12 +575,12 @@ def date():
         for i in range(0,num_gene):
             gene_list.append(gene_name1.split(',')[i])
     session['query'] = gene_list
-    message3="<b> Actions: </b><li><font color=\"red\">Click on the keywords to see the indicated number of abstracts </font><li> Click on a gene to search its relations with top 200 addiction genes<li>Click on a keyword to see the terms included in the search<li>Hover your pointer over a node to hide other links <li>Nodes can be moved around for better visibility, reload the page will restore the original layout<li> View the results in <a href='cytoscape'><b>a graph.</b></a>"
+    message3="<b> Actions: </b><li><font color=\"#E74C3C\">Click on the keywords to see the indicated number of abstracts </font><li> Click on a gene to search its relations with top 200 addiction genes<li>Click on a keyword to see the terms included in the search<li>Hover your pointer over a node to hide other links <li>Move nodes around to adjust visibility, reload the page to restore the default layout<li> View the results in <a href='cytoscape'><b>a graph.</b></a>"
     return render_template('tableview.html', title='',nodata_temp=nodata_temp, date=select_date, num_gene=num_gene,session_path = session['path'], jedges=jedges, jnodes=jnodes,gene_name=gene_name, message3=message3)
 
 @app.route('/cytoscape')
 def cytoscape():
-    message2="<b> Notes: </b><li><font color=\"red\">Click on a line to see the indicated number of abstracts </font> <li> Click on a gene to search its relations with top 200 addiction genes<li>Click on a keyword to see the terms included in the search<li>Hover your pointer over a node to hide other links <li>Nodes can be moved around for better visibility, reload the page will restore the original layout<li>View the results in <a href='tableview'><b>a table. </b></a>"
+    message2="<b> Actions: </b><li><font color=\"#E74C3C\">Click on a line to see the indicated number of abstracts </font> <li> Click on a gene to search its relations with top 200 addiction genes<li>Click on a keyword to see the terms included in the search<li>Hover your pointer over a node to hide other links <li>Move nodes around to adjust visibility, reload the page to restore the default layout<li>View the results in <a href='tableview'><b>a table. </b></a> <li>All results will appear in a new Browser window (or tab)"
     with open(session['path']+"_cy","r") as f:
         elements=f.read()
     with open(session['path']+"_0link","r") as z:
@@ -756,4 +756,4 @@ def top150genes():
 
 if __name__ == '__main__':
     db.create_all()
-    app.run(debug=True, port=4200)
+    app.run(debug=True, port=4201)
