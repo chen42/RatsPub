@@ -33,47 +33,33 @@
 * nltk==3.4.5
   * six==1.14.0
 
-* tensorflow==1.14.0
+* tensorflow==1.9.0
   * absl-py==0.9.0
     * six==1.14.0
   * astor==0.8.1
   * gast==0.2.2
-  * google-pasta==0.1.8
-    * six==1.14.0
   * grpcio==1.27.2
-    * six==1.14.0
-  * Keras-Applications==1.0.8
-    * h5py==2.10.0
-      * numpy==1.18.1
-      * six==1.14.0
-    * numpy==1.18.1
-  * Keras-Preprocessing==1.1.0
-    * numpy==1.18.1
     * six==1.14.0
   * numpy==1.18.1
   * protobuf==3.11.3
-    * setuptools==45.2.0
+    * setuptools==39.1.0
     * six==1.14.0
+  * setuptools==39.1.0
   * six==1.14.0
-  * tensorboard==1.14.0
-    * absl-py==0.9.0
-      * six==1.14.0
-    * grpcio==1.27.2
-      * six==1.14.0
+  * tensorboard==1.9.0
     * Markdown==3.2.1
-      * setuptools==45.2.0
+      * setuptools==39.1.0
     * numpy==1.18.1
     * protobuf==3.11.3
-      * setuptools==45.2.0
+      * setuptools==39.1.0
       * six==1.14.0
-    * setuptools==45.2.0
     * six==1.14.0
     * Werkzeug==1.0.0
     * wheel==0.34.2
-  * tensorflow-estimator==1.14.0
   * termcolor==1.1.0
   * wheel==0.34.2
-  * wrapt==1.11.2
+
+* tensorflow-estimator==1.14.0
 
 * python==3.6.9
 
