@@ -150,7 +150,7 @@ n2=generate_nodes(drug_d, 'drug')
 n3=generate_nodes(brain_d, 'brain')
 n4=generate_nodes(stress_d, 'stress')
 n5=generate_nodes(psychiatric_d, 'psychiatric')
-n6=generate_nodes(psychiatric_d, 'GWAS')
+n6=''
 
 nj0=generate_nodes_json(function_d, 'function')
 nj1=generate_nodes_json(addiction_d, 'addiction')
@@ -158,7 +158,7 @@ nj2=generate_nodes_json(drug_d, 'drug')
 nj3=generate_nodes_json(brain_d, 'brain')
 nj4=generate_nodes_json(stress_d, 'stress')
 nj5=generate_nodes_json(psychiatric_d, 'psychiatric')
-nj6=generate_nodes_json(psychiatric_d, 'GWAS')
+nj6=''
 
 
 
