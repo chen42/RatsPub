@@ -3,8 +3,9 @@ from nltk.tokenize import sent_tokenize
 import os
 import re
 from ratspub_keywords import *
+from gene_synonyms import *
 
-global function_d, brain_d, drug_d, addiction_d, brain_query_term, pubmed_path
+global function_d, brain_d, drug_d, addiction_d, brain_query_term, pubmed_path, genes
 
 ## turn dictionary (synonyms) to regular expression
 def undic(dic):
@@ -141,6 +142,8 @@ function=undic(function_d)
 addiction=undic(addiction_d)
 drug=undic(drug_d)
 
+gene_s=undic(genes)
+
 nodecolor={'function':"#A9CCE3", 'addiction': "#D7BDE2", 'drug': "#F9E79F", 'brain':"#A3E4D7", 'GWAS':"#AEB6BF", 'stress':"#EDBB99", 'psychiatric':"#F5B7B1"}
 #https://htmlcolorcodes.com/ third column down
 
@@ -162,10 +165,14 @@ nj6=''
 
 
 
-pubmed_path=os.environ["EDIRECT_PUBMED_MASTER"]
-if ( not pubmed_path): 
-    pubmed_path="~/Dropbox/ChenLab/Hakan/RatsPub/PubMed"
-pubmed_path +="/Archive"
+####pubmed_path=os.environ["EDIRECT_PUBMED_MASTER"]
+
+####if ( not pubmed_path): 
+####    pubmed_path="~/Dropbox/ChenLab/Hakan/RatsPub/PubMed"
+####pubmed_path +="/Archive"
+
+pubmed_path = "~/Documents/RatsPub/PubMed"
+
 '''
 print (pubmed_path)
 host= os.popen('hostname').read().strip()
