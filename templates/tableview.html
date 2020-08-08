@@ -94,7 +94,8 @@
                     this_url1 = 'sentences?edgeID='+'{{session_path}}'+'_snt|'+source+'|'+target;
                     this_url2 = 'shownode?nodetype='+type+'&node='+target;
             {%endif%}
-            genegene_url = '/startGeneGene?forTopGene='+source;
+            //genegene_url = '/startGeneGene?forTopGene='+source;
+            genegene_url = 'synonyms?node='+source;
             y.innerHTML="<a href='"+genegene_url+"'>{{p['source']}}</a>";
             y= x.insertCell(1);
             y.innerHTML="<center> <a href='"+this_url1+"'> {{p['sentCnt']}}</a> </center>"; 
