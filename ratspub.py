@@ -165,13 +165,11 @@ nj6=''
 
 
 
-####pubmed_path=os.environ["EDIRECT_PUBMED_MASTER"]
+pubmed_path=os.environ["EDIRECT_PUBMED_MASTER"]
 
-####if ( not pubmed_path): 
-####    pubmed_path="~/Dropbox/ChenLab/Hakan/RatsPub/PubMed"
-####pubmed_path +="/Archive"
-
-pubmed_path = "~/Documents/RatsPub/PubMed"
+if ( not pubmed_path): 
+    pubmed_path="~/Documents/RatsPub/PubMed"
+pubmed_path +="/Archive"
 
 '''
 print (pubmed_path)
