@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+<br>
+
+<h2> <b>{{gene}} </b> </h2>
+{%if case == 1%}
+    {%for syn in synonym_list%}
+    <a href=http://rats.pub/progress?type=GWAS&type=addiction&type=drug&type=brain&type=stress&type=psychiatric&type=function&query={{syn}}>{{syn}}</a>
+    <br>
+    {%endfor%}
+    <br>
+    <a href=http://rats.pub/progress?type=GWAS&type=addiction&type=drug&type=brain&type=stress&type=psychiatric&type=function&query={{synonym_list_str}}>Search for all synonyms</a>
+{%else%}
+    We cannot find any synonyms for {{gene}} 
+{%endif%} 
+<br>
+<hr>
+<h3>Gene gene search for all synonyms:</h3>
+<b><a href=" /startGeneGene?forTopGene=+ {{gene}}" >{{gene}} and its synonyms</a> </b>
+{% endblock %}
+
+
+
