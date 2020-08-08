@@ -37,11 +37,16 @@ from tensorflow.keras import optimizers
 import pickle
 
 app=Flask(__name__)
-datadir="/export/ratspub/"
+####datadir="/export/ratspub/"
 app.config['SECRET_KEY'] = '#DtfrL98G5t1dC*4'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+datadir+'userspub.sqlite'
+####app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+datadir+'userspub.sqlite'
+####db = SQLAlchemy(app)
+####nltk.data.path.append("./nlp/")
+
+datadir=""
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///userspub.sqlite'
 db = SQLAlchemy(app)
-nltk.data.path.append("./nlp/")
+
 
 # the sqlite database
 class users(db.Model):
@@ -227,9 +232,16 @@ def progress():
     genes=genes.replace(",", " ")
     genes=genes.replace(";", " ")
     genes=re.sub(r'\bLOC\d*?\b', "", genes, flags=re.I)
-    genes=genes.split()
-    if len(genes)>=100:
-        message="<span class='text-danger'>Up to 100 terms can be searched at a time</span>"
+    genes1 = [f[1:-1] for f in re.findall('".+?"', genes)]
+    genes2 = [p for p in re.findall(r'([^""]+)',genes) if p not in genes1]
+    genes2_str = ''.join(genes2)
+    genes2 = genes2_str.split()
+    genes3 = genes1 + genes2
+    genes = [re.sub("\s+", '-', s) for s in genes3]
+
+    #genes=genes.split()
+    if len(genes)>=30:
+        message="<span class='text-danger'>Up to 30 terms can be searched at a time</span>"
         return render_template('index.html', message=message)
     elif len(genes)==0:
         message="<span class='text-danger'>Please enter a search term </span>"
@@ -387,7 +399,8 @@ def search():
             ## there is a bug here. zero link notes are not excluded anymore
             if len(geneEdges) >1:
                 edges+=geneEdges
-                nodes+="{ data: { id: '" + gene +  "', nodecolor:'#E74C3C', fontweight:700, url:'/startGeneGene?forTopGene="+gene+"'} },\n"
+                #nodes+="{ data: { id: '" + gene +  "', nodecolor:'#E74C3C', fontweight:700, url:'/startGeneGene?forTopGene="+gene+"'} },\n"
+                nodes+="{ data: { id: '" + gene +  "', nodecolor:'#E74C3C', fontweight:700, url:'/synonyms?node="+gene+"'} },\n"
             else:
                 nodesToHide+=gene +  " "
             sentences+=sent0+sent1+sent2+sent3+sent4+sent5
@@ -614,6 +627,7 @@ def sentences():
         else:
             return 'pos'
     pmid_list=[]
+    pmid_string=''
     edge=request.args.get('edgeID')
     (tf_name, gene0, cat0)=edge.split("|")
     if(cat0=='stress'):
@@ -634,6 +648,7 @@ def sentences():
                 out3+= "<li> "+ text + " <a href=\"https://www.ncbi.nlm.nih.gov/pubmed/?term=" + pmid +"\" target=_new>PMID:"+pmid+"<br></a>"
                 num_abstract += 1
                 if(pmid+cat0 not in pmid_list):
+                    pmid_string = pmid_string + ' ' + pmid
                     pmid_list.append(pmid+cat0)
                 if(cat0=='stress'):
                     out4 = predict_sent(text)
@@ -645,9 +660,9 @@ def sentences():
                         out_neg += out_pred_neg
     out1="<h3>"+gene0 + " and " + cat0  + "</h3>\n"
     if len(pmid_list)>1:
-        out2 = str(num_abstract) + ' sentences in ' + str(len(pmid_list)) + ' studies' + "<br><br>"
+        out2 = str(num_abstract) + ' sentences in ' + " <a href=\"https://www.ncbi.nlm.nih.gov/pubmed/?term=" + pmid_string +"\" target=_new>"+ str(len(pmid_list)) + ' studies' +"<br></a>" + "<br><br>"
     else:
-        out2 = str(num_abstract) + ' sentence(s) in ' + str(len(pmid_list)) + ' study' "<br><br>"
+        out2 = str(num_abstract) + ' sentence(s) in '+ " <a href=\"https://www.ncbi.nlm.nih.gov/pubmed/?term=" + pmid_string +"\" target=_new>"+ str(len(pmid_list)) + ' study' +"<br></a>" "<br><br>"
     if(out_neg == "" and out_pos == ""):
         out= out1+ out2 +out3
     elif(out_pos != "" and out_neg!=""):
@@ -672,6 +687,31 @@ def shownode():
     allnodes={**brain_d, **drug_d, **function_d, **addiction_d, **stress_d, **psychiatric_d}
     out="<p>"+node.upper()+"<hr><li>"+ allnodes[node].replace("|", "<li>")
     return render_template('sentences.html', sentences=out+"<p>")
+
+@app.route("/synonyms")
+def synonyms():
+    node=request.args.get('node')
+    node=node.upper()
+    allnodes={**genes}
+    try:
+        synonym_list = list(allnodes[node].split("|")) 
+        session['synonym_list'] = synonym_list
+        session['main_gene'] = node.upper()
+        out="<hr><li>"+ allnodes[node].replace("|", "<li>")
+        synonym_list_str = ';'.join([str(syn) for syn in synonym_list]) 
+        synonym_list_str +=';' + node
+        case = 1
+        return render_template('genenames.html', case = case, gene = node.upper(), synonym_list = synonym_list, synonym_list_str=synonym_list_str)
+    except:
+        if(node in session['synonym_list']):
+            synonym_list = session['synonym_list']
+            synonym_list_str = ';'.join([str(syn) for syn in synonym_list]) 
+            synonym_list_str +=';' + node
+            case = 1
+            return render_template('genenames.html', case=case, gene = session['main_gene'] , synonym_list = synonym_list, synonym_list_str=synonym_list_str)
+        else:
+            case = 2
+            return render_template('genenames.html', gene = node, case = case)
 
 @app.route("/startGeneGene")
 def startGeneGene():
