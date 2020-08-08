@@ -37,15 +37,11 @@ from tensorflow.keras import optimizers
 import pickle
 
 app=Flask(__name__)
-####datadir="/export/ratspub/"
+datadir="/export/ratspub/"
 app.config['SECRET_KEY'] = '#DtfrL98G5t1dC*4'
-####app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+datadir+'userspub.sqlite'
-####db = SQLAlchemy(app)
-####nltk.data.path.append("./nlp/")
-
-datadir=""
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///userspub.sqlite'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+datadir+'userspub.sqlite'
 db = SQLAlchemy(app)
+nltk.data.path.append("./nlp/")
 
 
 # the sqlite database
