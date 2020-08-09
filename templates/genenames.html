@@ -2,21 +2,21 @@
 {% block content %}
 <br>
 
-<h2> <b>{{gene}} </b> </h2>
+<h2> {{gene}} </h2>
+<h3>The following synonyms are found in the database. You can either search them one at a time by clicking on the name or <a href=http://rats.pub/progress?type=GWAS&type=addiction&type=drug&type=brain&type=stress&type=psychiatric&type=function&query={{synonym_list_str}}>search all of them at once (slower)</a>
 {%if case == 1%}
     {%for syn in synonym_list%}
-    <a href=http://rats.pub/progress?type=GWAS&type=addiction&type=drug&type=brain&type=stress&type=psychiatric&type=function&query={{syn}}>{{syn}}</a>
-    <br>
+		<a href=http://rats.pub/progress?type=GWAS&type=addiction&type=drug&type=brain&type=stress&type=psychiatric&type=function&query={{syn}}>{{syn}}</a>
+		<br>
     {%endfor%}
     <br>
-    <a href=http://rats.pub/progress?type=GWAS&type=addiction&type=drug&type=brain&type=stress&type=psychiatric&type=function&query={{synonym_list_str}}>Search for all synonyms</a>
 {%else%}
-    We cannot find any synonyms for {{gene}} 
+    No synonym for {{gene}} is found. 
 {%endif%} 
 <br>
 <hr>
-<h3>Gene gene search for all synonyms:</h3>
-<b><a href=" /startGeneGene?forTopGene=+ {{gene}}" >{{gene}} and its synonyms</a> </b>
+<h3>Search relationship between {{gene}} and top addiction genes ranked by literature:</h3>
+<b><a href=" /startGeneGene?forTopGene=+ {{gene}}" >{{gene}} and top addiction genes </a> </b>
 {% endblock %}
 
 
