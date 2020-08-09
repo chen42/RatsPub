@@ -7,7 +7,7 @@ addiction_d={"reward":"reward|hedonic|incentive|intracranial-self-stimulation|IC
         "dependence":"dependence",
         "intoxication":"intoxication|binge"}
 drug_d={"alcohol":"alcohol|alcoholism|alcoholic|alcoholics|ethanol|disulfiram|antabuse|naltrexone|revia|vivitrol|acamprosate|campral",
-        "benzodiazepine":"Benzodiazepine",
+        "benzodiazepine":"adinazolam|alprazolam|benzodiazepine|benzos|brotizolam|chlordiazepoxide|climazolam|clobazam|clonazepam|clorazepate|diazepam|estazolam|flunitrazepam|flurazepam|halazepam|librium|loprazolam|lorazepam|lormetazepam|midazolam|nimetazepam|nitrazepam|normison|oxazepam|prazepam|temazepam|triazolam|valium|xanax",
         "psychedelics":"psychedelic|psychedelics|lysergic-acid-diethylamide|LSD|ketamine|psilocybin|ibogaine|ayahuasca|mescaline|peyote|N-methoxybenzyl|NBOMe|NBOMes|methylenedioxymethamphetamine|MDMA|ecstasy",
         "nicotine":"smoking|nicotine|tobacco|smoker|smokers",
         "cocaine":"cocaine",
