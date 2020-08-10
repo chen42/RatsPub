@@ -7,14 +7,14 @@ addiction_d={'addiction':'addiction|addictive|compulsive|drug-abuse|escalation|p
 'sensitization':'sensitization',
 'withdrawal':'withdrawal'}
 
-brain_d={'VTA':'limbic|mesoaccumbal|mesoaccumbens|mesolimbic|midbrain|pvta|ventral-tegmental|vta',
-'accumbens':'acbc|acbs|accumbal|accumbens|core|Nacc|NacSh|shell',
+brain_d={'accumbens':'acbc|acbs|accumbal|accumbens|core|Nacc|NacSh|shell',
 'amygdala':'amy|amygdala|bla|cea|cna',
 'cortex':'cerebral|cingulate|cortex|cortico-limbic|corticolimbic|corticostriatal|infralimbic|insula|insular|mPFC|orbitofrontal|pfc|prefrontal|prelimbic|prl|vmpfc',
 'habenula':'habenula|lhb|mhb',
 'hippocampus':'ca1|ca3|dentate-gyrus|dhpc|hip|hipp|hippocampal|hippocampus|subiculum|vhipp|vhpc',
 'hypothalamus':'hypothalamic|hypothalamus|LHA|paraventricular-nucleus|PVN',
-'striatum':'basal-ganglia|caudate|globus-pallidus|GPI|putamen|STR|striatal|striatum'}
+'striatum':'basal-ganglia|caudate|globus-pallidus|GPI|putamen|STR|striatal|striatum',
+'VTA':'limbic|mesoaccumbal|mesoaccumbens|mesolimbic|midbrain|pvta|ventral-tegmental|vta'}
 
 drug_d={'alcohol':'acamprosate|alcohol|alcoholic|alcoholics|alcoholism|antabuse|campral|disulfiram|ethanol|naltrexone|revia|vivitrol',
 'amphetamine':'AMPH|amphetamine|METH|methamphetamine',
