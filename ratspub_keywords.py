@@ -27,7 +27,7 @@ drug_d={'alcohol':'acamprosate|alcohol|alcoholic|alcoholics|alcoholism|antabuse|
 
 function_d={'neuroplasticity':'boutons|epsc|epsp|IPSC|IPSP|long-term-depression|long-term-potentiation|LTD|LTP|mIPSC|neurite|neurogenesis|neuroplasticity|plasticity|synaptic',
 'neurotransmission':'5-ht|acetylcholine|cholinergic|DAergic|dopamine|dopaminergic|GABA|GABAergic|glutamate|glutamatergic|muscarinic|neuropeptide|neuropeptides|neurotransmission|nicotinic|serotonergic|serotonin',
-'signalling':'glycosylation|phosphorylation|signaling|signalling',
+'signalling':'glycosylation|phosphorylation|signaling|signalling|kinase|binding|signal transduction|second messengers|cGMP|cAMP',
 'transcription':'histone|hypermethylation|hypomethylation|methylation|ribosome|transcription'}
 
 psychiatric_d={'anxiety':'anxiety|anxious',
@@ -38,6 +38,6 @@ psychiatric_d={'anxiety':'anxiety|anxious',
 'impulsivity':'impulsive|impulsivity',
 'schizophrenia':'schizophrenia'}
 
-stress_d={'PTSD':'PTSD',
+stress_d={'PTSD':'PTSD|post-traumatic-stress|post-traumatic-stress-symptoms|post-traumatic-stress-disorder',
 'stress':'distress|psychological-trauma|stress'}
 
