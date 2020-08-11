@@ -4,15 +4,15 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 
 <script>
-var r =  Math.floor(Math.random() * Math.floor(200));
-var g =  150;
-var b =  Math.floor(Math.random() * Math.floor(200));
-document.body.style.backgroundColor = 'rgba('+r+','+g+','+b+',0.1)'
+//var r =  Math.floor(Math.random() * Math.floor(200));
+//var g =  150;
+//var b =  Math.floor(Math.random() * Math.floor(200));
+//document.body.style.backgroundColor = 'rgba('+r+','+g+','+b+',0.1)'
 var source = new EventSource("/{{ url_in |safe }}");
 source.onmessage = function(event) {
 	$('.progress-bar').css('width', event.data+'%').attr('aria-valuenow', event.data);
-	var alpha = 1-event.data/150
-	document.body.style.backgroundColor = 'rgba('+r+','+g+','+b+',0.3)'.replace(/[^,]+(?=\))/, alpha)
+//	var alpha = 1-event.data/150
+//	document.body.style.backgroundColor = 'rgba('+r+','+g+','+b+',0.1)'.replace(/[^,]+(?=\))/, alpha)
 	if(event.data == 100){
 		window.location.replace("/{{ url_out | safe}}")
 		source.close()
