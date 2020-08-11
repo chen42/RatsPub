@@ -34,8 +34,8 @@ psychiatric_d={'anxiety':'anxiety|anxious',
 'autism':'autism|autistic',
 'bipolar':'bipolar-disorder',
 'compulsive':'compulsive|obsessive',
-'depression':'depression|depressive',
-'impulsivity':'impulsive|impulsivity',
+'depression':'depression|depressive|major-depressive-disorder|MDD',
+'impulsivity':'5-CSRTT|5-choice-task|delay-discounting|delay-exposure|delay-intolerance|delayed-reward|delay-task|five-choice-serial-reaction-time-task|impulsive|impulsivity|premature-responding',
 'schizophrenia':'schizophrenia'}
 
 stress_d={'PTSD':'PTSD|post-traumatic-stress|post-traumatic-stress-symptoms|post-traumatic-stress-disorder',
