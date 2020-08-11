@@ -18,7 +18,7 @@
 {%if case == 1%}
     {%for syn in synonym_list%}
 
-	<li>	<a href=http://rats.pub/progress?type=GWAS&type=addiction&type=drug&type=brain&type=stress&type=psychiatric&type=function&query={{syn}}>{{syn}}</a>
+	<li>	<a href=http://rats.pub/progress?type=GWAS&type=addiction&type=drug&type=brain&type=stress&type=psychiatric&type=function&query={{syn}}>{{syn.replace("-", " ")}}</a>
     {%endfor%}
 </ul>
     <br>
