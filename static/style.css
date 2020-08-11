@@ -53,7 +53,9 @@ a:active {
 }
 
 #searchform{
-	background:#EBF5FB;
+  background:#EBF5FB;
+  padding-top: 0;
+  padding-left: 0;
 
 }
 
