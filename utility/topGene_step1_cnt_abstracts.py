@@ -36,8 +36,10 @@ def saveStopWord(w):
 
 if len(sys.argv)==2:
     input_f=sys.argv[1]
+    mincnt=10
 else:
     input_f="./ncbi_gene_symb_syno_name_txid9606.txt"
+    mincnt=0;
 
 addiction=undic(addiction_d)
 drug=undic(drug_d)
@@ -52,10 +54,14 @@ with open (stopword_f, "r") as swf:
 with open (input_f, "r") as f:
     for line in f:
         do_search=0
+        skip=0
         inputline=line
         line=line.replace("-","\ ")
         # remove the annotated stopword
-        if "'" in line:
+        if re.findall(r"^xx", line):
+            print ("skip this line\n")
+            skip=1
+        elif "'" in line:
             do_search=1
             words=line.split("|")
             line=str()
@@ -72,14 +78,14 @@ with open (input_f, "r") as f:
         # tab is added if there are abstracts counts
         if "\t" in line:
             (gene, count)=line.split("\t")
-            # rerun if count is low, these are less annotated
-        #    if int(count)<50:
-        #        do_search=1
+            # rerun if count > 20; save time on reruns 
+            if int(count)>=20:
+                do_search=1
         else:
             #no count, 
             gene=line.strip()
             do_search=1
-        if do_search==1:
+        if do_search==1 and skip==0:
             # remove synonyms with only two letters
             if "|" in gene:
                 synos=gene.split("|")
