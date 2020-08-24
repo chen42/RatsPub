@@ -13,7 +13,7 @@ with open("./addiction_gwas.tsv", "r") as f:
         if re.search('cocaine', trait, flags=re.I):
             key1="addiction"
             key2="cocaine"
-        elif re.search('smoking|congestive|nicotine', trait, flags=re.I):
+        elif re.search('smoking|congestive|nicotine|obstructive', trait, flags=re.I):
             key1="addiction"
             key2="nicotine"
         elif re.search('opioid|morphin|heroin|methadone', trait, flags=re.I):
@@ -22,16 +22,16 @@ with open("./addiction_gwas.tsv", "r") as f:
         elif re.search('amphetam', trait, flags=re.I):
             key1="addiction"
             key2="amphetamine"
-        elif re.search('canabis', trait, flags=re.I):
+        elif re.search('cannabis', trait, flags=re.I):
             key1="addiction"
-            key2="canabis"
+            key2="cannabis"
         elif re.search('food', trait, flags=re.I):
             key1="addiction"
             key2="food"
         elif re.search('alcohol', trait, flags=re.I):
             key1="addiction"
             key2="alcohol"
-        elif re.search('addiction|abuse', trait, flags=re.I):
+        elif re.search('addiction|abuse|dependence', trait, flags=re.I):
             key1="addiction"
             key2="addiction"
         else:
