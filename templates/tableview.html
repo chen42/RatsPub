@@ -88,14 +88,14 @@
                 color="#AEB6BF"
                 type='GWAS'
                 key_gwas = target.replace("_GWAS","")
-                    this_url1 = 'sentences?edgeID=gwas_addiction.tab|'+source+'|'+target;
+                    this_url1 = '\\sentences?edgeID=gwas_addiction.tab|'+source+'|'+target;
                     this_url2 = 'https://www.ebi.ac.uk/gwas/search?query='+key_gwas;
                 {%else%}
-                    this_url1 = 'sentences?edgeID='+'{{session_path}}'+'_snt|'+source+'|'+target;
-                    this_url2 = 'shownode?nodetype='+type+'&node='+target;
+                    this_url1 = '\\sentences?edgeID='+'{{genes_session_tmp}}'+'_snt|'+source+'|'+target;
+                    this_url2 = '\\shownode?nodetype='+type+'&node='+target;
             {%endif%}
             //genegene_url = '/startGeneGene?forTopGene='+source;
-            genegene_url = 'synonyms?node='+source;
+            genegene_url = '\\synonyms?node='+source;
             y.innerHTML="<a href='"+genegene_url+"'>{{p['source']}}</a>";
             y= x.insertCell(1);
             y.innerHTML="<center> <a href='"+this_url1+"'> {{p['sentCnt']}}</a> </center>"; 
@@ -108,6 +108,6 @@
     </script>
 {%endif%}
 <br>
-<a href="/tableview0">Review</a> searches that have <b>zero</b> abstract counts.
+<a href='/tableview0/?rnd={{rnd_url}}&genequery={{genes_url}}'>Review</a> searches that have <b>zero</b> abstract counts.
 
 {%endblock%}
