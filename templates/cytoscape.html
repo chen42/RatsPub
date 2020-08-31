@@ -2,7 +2,9 @@
 {% block content %}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.6.0/cytoscape.min.js" integrity="sha256-uZV2wRlscgr52q3Wb3Oew0rKCPsM3g4aBTv46sF4qzg=" crossorigin="anonymous"></script>
-
+<script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+<script src="https://unpkg.com/file-saver@1.3.8/FileSaver.js"></script>
+<script src="https://unpkg.com/cytoscape-svg/cytoscape-svg.js"></script>
 
 <div class="row">
   <div class="column left" >
@@ -13,10 +15,16 @@
   <div class="column right">
 
  {{ message2 |safe}} 
+ <br>
+ <br>
+
+ <button style="color: #008CBA; width: 120px; height: 30px;" onclick="saveAsSvg()">Save as SVG</button>
+<button style="color: #008CBA; width: 120px; height: 30px;" onclick="window.location=getSvgUrl()">View SVG</button>
+
 </div>
 
-
  <div id="cy"></div>
+
 	<script>
 		var cy = cytoscape({
 			container: document.getElementById('cy'),
@@ -100,7 +108,22 @@
 			cy.elements().removeClass('semitransp');
 			sel.removeClass('highlight').outgoers().removeClass('highlight');
 		});
-    </script>
+
+		var saveAsSvg = function(filename) {
+		   var svgContent = cy.svg();
+		   var blob = new Blob([svgContent], {type:"image/svg+xml;charset=utf-8"});
+		   saveAs(blob, "ratspub_graph.svg");
+	   };
+	   var getSvgUrl = function() {
+		   var svgContent = cy.svg({scale: 1, full: true});
+		   var blob = new Blob([svgContent], {type:"image/svg+xml;charset=utf-8"});
+		   var url = URL.createObjectURL(blob);
+		   return url;
+	   }
+
+
+	</script>
+	
 
 
 {% endblock %}
