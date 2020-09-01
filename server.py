@@ -37,8 +37,8 @@ from tensorflow.keras import optimizers
 import pickle
 
 app=Flask(__name__)
-#datadir="/export/ratspub/"
-datadir = "."
+datadir="/export/ratspub/"
+#datadir = "."
 app.config['SECRET_KEY'] = '#DtfrL98G5t1dC*4'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+datadir+'userspub.sqlite'
 db = SQLAlchemy(app)
@@ -856,4 +856,4 @@ def top150genes():
 
 if __name__ == '__main__':
     db.create_all()
-    app.run(debug=True, port=4201)
+    app.run(debug=True, port=4200)
