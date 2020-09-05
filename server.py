@@ -6,6 +6,7 @@ import shutil
 from flask import jsonify
 from datetime import datetime
 import bcrypt
+import hashlib
 import tempfile
 import random
 import string
@@ -37,8 +38,8 @@ from tensorflow.keras import optimizers
 import pickle
 
 app=Flask(__name__)
-datadir="/export/ratspub/"
-#datadir = "."
+#datadir="/export/ratspub/"
+datadir = "."
 app.config['SECRET_KEY'] = '#DtfrL98G5t1dC*4'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+datadir+'userspub.sqlite'
 db = SQLAlchemy(app)
@@ -105,6 +106,8 @@ def login():
         found_user = users.query.filter_by(email=email).first()
         if (found_user and (bcrypt.checkpw(password.encode('utf8'), found_user.password))):
             session['email'] = found_user.email
+            print(bcrypt.hashpw(session['email'].encode('utf8'), bcrypt.gensalt()))
+            session['hashed_email'] = hashlib.md5(session['email'] .encode('utf-8')).hexdigest()
             session['name'] = found_user.name
             session['id'] = found_user.id
         else:
@@ -124,11 +127,13 @@ def signup():
             flash("Already registered, but wrong password!", "loginout")
             return render_template('signup.html')        
         session['email'] = email
+        session['hashed_email'] = hashlib.md5(session['email'] .encode('utf-8')).hexdigest()
         session['name'] = name
         password = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
         user = users(name=name, email=email, password = password)       
         if found_user:
             session['email'] = found_user.email
+            session['hashed_email'] = hashlib.md5(session['email'] .encode('utf-8')).hexdigest()
             session['id'] = found_user.id
             found_user.name = name
             db.session.commit()
@@ -154,6 +159,7 @@ def signin():
         found_user = users.query.filter_by(email=email).first()
         if (found_user and (bcrypt.checkpw(password.encode('utf8'), found_user.password))):
             session['email'] = found_user.email
+            session['hashed_email'] = hashlib.md5(session['email'] .encode('utf-8')).hexdigest()
             session['name'] = found_user.name
             session['id'] = found_user.id
             flash("Login Succesful!", "loginout")
@@ -175,6 +181,7 @@ def profile(nm_passwd):
             if request.method == "POST":
                 password = request.form['password']
                 session['email'] = found_user.email
+                session['hashed_email'] = hashlib.md5(session['email'] .encode('utf-8')).hexdigest()
                 session['name'] = found_user.name
                 session['id'] = found_user.id
                 password = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
@@ -241,6 +248,7 @@ def progress():
         message="<span class='text-danger'>Please enter a search term </span>"
         return render_template('index.html', message=message)
     tf_path=tempfile.gettempdir()
+    #tf_path = "/tmp/"
 
     genes_for_folder_name =""
     if len(genes) == 1:
@@ -269,15 +277,16 @@ def progress():
     user_login=0
     #create a folder for the search
     if ('email' in session):
-        os.makedirs(datadir + "/user/"+str(session['email']+"/"+timeextension+"_0_"+genes_for_folder_name+marker),exist_ok=True)
-        session['user_folder'] = datadir+"/user/"+str(session['email'])
-        session['path_user'] = datadir+"/user/"+str(session['email'])+"/"+timeextension+"_0_"+genes_for_folder_name+marker+"/"
+        os.makedirs(datadir + "/user/"+str(session['hashed_email'])+"/"+str(timeextension)+"_0_"+genes_for_folder_name+marker,exist_ok=True)
+        session['user_folder'] = datadir+"/user/"+str(session['hashed_email'])
+        session['path_user'] = datadir+"/user/"+str(session['hashed_email'])+"/"+str(timeextension)+"_0_"+genes_for_folder_name+marker+"/"
         session['rnd'] = timeextension+"_0_"+genes_for_folder_name+marker
         rnd = session['rnd']
     else:
         rnd = "tmp" + ''.join(random.choice(string.ascii_letters) for x in range(6)) 
         session['path']=tf_path+ "/" + rnd
-        os.makedirs(datadir+ session['path'])
+        #os.makedirs(datadir+ session['path'])
+        os.makedirs(session['path'])
     
     genes_session = ''
     for gen in genes:
@@ -299,7 +308,8 @@ def search():
     else:
         user_login=0
         sessionpath = session['path']
-        path_user=datadir+session['path']+"/"
+        #path_user=datadir+session['path']+"/"
+        path_user=session['path']+"/"
 
     snt_file=sessionpath+"_snt"
     cysdata=open(sessionpath+"_cy","w+")
@@ -452,27 +462,43 @@ def tableview():
     tf_path=tempfile.gettempdir()
     if ('email' in session):
         filename = rnd_url.split("_0_")[0]
-        genes_session_tmp = datadir+"/user/"+str(session['email'])+"/"+rnd_url+"/"+filename
-        gene_url_tmp = "/user/"+str(session['email'])+"/"+rnd_url
+        genes_session_tmp = datadir+"/user/"+str(session['hashed_email'])+"/"+rnd_url+"/"+filename
+        gene_url_tmp = "/user/"+str(session['hashed_email'])+"/"+rnd_url
+        try:
+            with open(datadir+gene_url_tmp+"/nodes.json") as jsonfile:
+                jnodes = json.load(jsonfile)
+        except FileNotFoundError:
+            flash("You logged out!")
+            return render_template('index.html')
+        jedges =''
+        file_edges = open(datadir+gene_url_tmp +'/edges.json', 'r')
+        for line in file_edges.readlines():
+            if ':' not in line:
+                nodata_temp = 1
+            else: 
+                nodata_temp = 0
+                with open(datadir+gene_url_tmp +"/edges.json") as edgesjsonfile:
+                    jedges = json.load(edgesjsonfile)
+                break
     else:
         genes_session_tmp=tf_path+"/"+rnd_url
         gene_url_tmp = genes_session_tmp
-    try:
-        with open(datadir+gene_url_tmp+"/nodes.json") as jsonfile:
-            jnodes = json.load(jsonfile)
-    except FileNotFoundError:
-        flash("You logged out!")
-        return render_template('index.html')
-    jedges =''
-    file_edges = open(datadir+gene_url_tmp +'/edges.json', 'r')
-    for line in file_edges.readlines():
-        if ':' not in line:
-            nodata_temp = 1
-        else: 
-            nodata_temp = 0
-            with open(datadir+gene_url_tmp +"/edges.json") as edgesjsonfile:
-                jedges = json.load(edgesjsonfile)
-            break
+        try:
+            with open(gene_url_tmp+"/nodes.json") as jsonfile:
+                jnodes = json.load(jsonfile)
+        except FileNotFoundError:
+            flash("You logged out!")
+            return render_template('index.html')
+        jedges =''
+        file_edges = open(gene_url_tmp +'/edges.json', 'r')
+        for line in file_edges.readlines():
+            if ':' not in line:
+                nodata_temp = 1
+            else: 
+                nodata_temp = 0
+                with open(gene_url_tmp +"/edges.json") as edgesjsonfile:
+                    jedges = json.load(edgesjsonfile)
+                break
     genename=genes_url.split("_")
     if len(genename)>3:
         genename = genename[0:3]
@@ -495,27 +521,43 @@ def tableview0():
     tf_path=tempfile.gettempdir()
     if ('email' in session):
         filename = rnd_url.split("_0_")[0]
-        genes_session_tmp = datadir+"/user/"+str(session['email'])+"/"+rnd_url+"/"+filename
-        gene_url_tmp = "/user/"+str(session['email'])+"/"+rnd_url
+        genes_session_tmp = datadir+"/user/"+str(session['hashed_email'])+"/"+rnd_url+"/"+filename
+        gene_url_tmp = "/user/"+str(session['hashed_email'])+"/"+rnd_url
+        try:
+            with open(datadir+gene_url_tmp+"/nodes.json") as jsonfile:
+                jnodes = json.load(jsonfile)
+        except FileNotFoundError:
+            flash("You logged out!")
+            return render_template('index.html')
+        jedges =''
+        file_edges = open(datadir+gene_url_tmp+'/edges.json', 'r')
+        for line in file_edges.readlines():
+            if ':' not in line:
+                nodata_temp = 1
+            else: 
+                nodata_temp = 0
+                with open(datadir+gene_url_tmp+"/edges.json") as edgesjsonfile:
+                    jedges = json.load(edgesjsonfile)
+                break
     else:
         genes_session_tmp=tf_path+"/"+rnd_url
         gene_url_tmp = genes_session_tmp
-    try:
-        with open(datadir+gene_url_tmp+"/nodes.json") as jsonfile:
-            jnodes = json.load(jsonfile)
-    except FileNotFoundError:
-        flash("You logged out!")
-        return render_template('index.html')
-    jedges =''
-    file_edges = open(datadir+gene_url_tmp+'/edges.json', 'r')
-    for line in file_edges.readlines():
-        if ':' not in line:
-            nodata_temp = 1
-        else: 
-            nodata_temp = 0
-            with open(datadir+gene_url_tmp+"/edges.json") as edgesjsonfile:
-                jedges = json.load(edgesjsonfile)
-            break
+        try:
+            with open(gene_url_tmp+"/nodes.json") as jsonfile:
+                jnodes = json.load(jsonfile)
+        except FileNotFoundError:
+            flash("You logged out!")
+            return render_template('index.html')
+        jedges =''
+        file_edges = open(gene_url_tmp+'/edges.json', 'r')
+        for line in file_edges.readlines():
+            if ':' not in line:
+                nodata_temp = 1
+            else: 
+                nodata_temp = 0
+                with open(gene_url_tmp+"/edges.json") as edgesjsonfile:
+                    jedges = json.load(edgesjsonfile)
+                break
     genes_url=request.args.get('genequery')
     genename=genes_url.split("_")
     if len(genename)>3:
@@ -534,11 +576,11 @@ def tableview0():
 @app.route("/userarchive")
 def userarchive():
     if ('email' in session):
-        if os.path.exists(datadir+"/user/"+str(session['email'])) == False:
+        if os.path.exists(datadir+"/user/"+str(session['hashed_email'])) == False:
             flash("Search history doesn't exist!")
             return render_template('index.html')
         else:
-            session['user_folder'] = datadir+"/user/"+str(session['email'])
+            session['user_folder'] = datadir+"/user/"+str(session['hashed_email'])
     else:
         flash("You logged out!")
         return render_template('index.html')
@@ -571,7 +613,7 @@ def userarchive():
 def remove():
     if('email' in session):
         remove_folder = request.args.get('remove_folder')
-        shutil.rmtree(datadir+"/user/"+str(session['email']+"/"+remove_folder), ignore_errors=True)
+        shutil.rmtree(datadir+"/user/"+str(session['hashed_email']+"/"+remove_folder), ignore_errors=True)
         return redirect(url_for('userarchive'))
     else:
         flash("You logged out!")
@@ -588,18 +630,18 @@ def date():
         gene_name1 = str(select_date).split('_0_')[1]
         time_extension = time_extension.replace(':', '_')
         time_extension = time_extension.replace('-', '_')
-        session['user_folder'] = tf_path+"/"+str(session['email'])
-        genes_session_tmp = tf_path+"/"+str(session['email'])+"/"+select_date+"/"+time_extension
-        with open(tf_path+"/"+str(session['email'])+"/"+select_date+"/nodes.json", "r") as jsonfile:
+        session['user_folder'] = tf_path+"/"+str(session['hashed_email'])
+        genes_session_tmp = tf_path+"/"+str(session['hashed_email'])+"/"+select_date+"/"+time_extension
+        with open(tf_path+"/"+str(session['hashed_email'])+"/"+select_date+"/nodes.json", "r") as jsonfile:
             jnodes = json.load(jsonfile)
         jedges =''
-        file_edges = open(tf_path+"/"+str(session['email'])+"/"+select_date+"/edges.json", "r")
+        file_edges = open(tf_path+"/"+str(session['hashed_email'])+"/"+select_date+"/edges.json", "r")
         for line in file_edges.readlines():
             if ':' not in line:
                 nodata_temp = 1
             else: 
                 nodata_temp = 0
-                with open(tf_path+"/"+str(session['email'])+"/"+select_date+"/edges.json", "r") as edgesjsonfile:
+                with open(tf_path+"/"+str(session['hashed_email'])+"/"+select_date+"/edges.json", "r") as edgesjsonfile:
                     jedges = json.load(edgesjsonfile)
                 break
         gene_list_all=[]
@@ -645,19 +687,29 @@ def cytoscape():
     message2="<b> Actions: </b><li><font color=\"#E74C3C\">Click on a line to see the indicated number of abstracts </font> <li> Click on a gene to search its relations with top 200 addiction genes<li>Click on a keyword to see the terms included in the search<li>Hover your pointer over a node to hide other links <li>Move nodes around to adjust visibility, reload the page to restore the default layout<li>View the results in <a href='\\tableview/?rnd={}&genequery={}'\ ><b>a table. </b></a> <li>All results will appear in a new Browser window (or tab)".format(rnd_url,genes_url)
     if ('email' in session):
         filename = rnd_url.split("_0_")[0]
-        rnd_url_tmp = datadir+"/user/"+str(session['email'])+"/"+rnd_url+"/"+filename
+        rnd_url_tmp = datadir+"/user/"+str(session['hashed_email'])+"/"+rnd_url+"/"+filename
+        try:
+            with open(rnd_url_tmp+"_cy","r") as f:
+                elements=f.read()
+        except FileNotFoundError:
+            flash("You logged out!")
+            return render_template('index.html')
+        with open(rnd_url_tmp+"_0link","r") as z:
+            zeroLink=z.read()
+            if (len(zeroLink)>0):
+                message2+="<span style=\"color:darkred;\">No result was found for these genes: " + zeroLink + "</span>"
     else:
         rnd_url_tmp=tf_path +"/" + rnd_url
-    try:
-        with open(rnd_url_tmp+"_cy","r") as f:
-            elements=f.read()
-    except FileNotFoundError:
-        flash("You logged out!")
-        return render_template('index.html')
-    with open(rnd_url_tmp+"_0link","r") as z:
-        zeroLink=z.read()
-        if (len(zeroLink)>0):
-            message2+="<span style=\"color:darkred;\">No result was found for these genes: " + zeroLink + "</span>"
+        try:
+            with open(rnd_url_tmp+"_cy","r") as f:
+                elements=f.read()
+        except FileNotFoundError:
+            flash("You logged out!")
+            return render_template('index.html')
+        with open(rnd_url_tmp+"_0link","r") as z:
+            zeroLink=z.read()
+            if (len(zeroLink)>0):
+                message2+="<span style=\"color:darkred;\">No result was found for these genes: " + zeroLink + "</span>"
     return render_template('cytoscape.html', elements=elements, message2=message2)
 
 @app.route("/sentences")
@@ -856,4 +908,4 @@ def top150genes():
 
 if __name__ == '__main__':
     db.create_all()
-    app.run(debug=True, port=4200)
+    app.run(debug=True, port=4201)
