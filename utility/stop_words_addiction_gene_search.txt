@@ -1428,3 +1428,192 @@ xxKRAS
 xxGRIN1
 xxFTCD
 FLIP
+5\ NT
+5NT
+A\ GAMMA3E
+AGAMMA3E
+
+5\ aminolevulinate\ synthase\ 1
+5\ aminolevulinate\ synthase\ 2
+APOB3MAR
+B\ T
+BT
+TFIIIB
+3\ 2\ ,\ 5\ bisphosphate\ nucleotidase\ 1
+3\ 2\ ,\ 5\ bisphosphate\ nucleotidase\ 2
+C5\ 3\ UTR\ overlapping\ transcript\ 1
+2,3\ cyclic\ nucleotide\ 3\ phosphodiesterase
+beta\ COP
+betaCOP
+CK2alpha
+casein\ kinase\ 2\ subunit\ alpha\ interacting\ protein
+
+DIS3\ homolog,\ exosome\ endoribonuclease\ and\ 3\ 5\ exoribonuclease
+DIS3\ like\ 3\ 5\ exoribonuclease\ 2
+DIS3\ like\ exosome\ 3\ 5\ exoribonuclease
+2\ deoxynucleoside\ 5\ phosphate\ N\ hydrolase\ 1
+3HEXO
+exonuclease\ 3\ 5\ domain\ containing\ 1
+
+exonuclease\ 3\ 5\ domain\ containing\ 2
+
+exonuclease\ 3\ 5\ domain\ containing\ 3
+FtsJ\ RNA\ 2\ O\ methyltransferase\ 1
+FtsJ\ RNA\ 2\ O\ methyltransferase\ 3
+GEN1\ Holliday\ junction\ 5\ flap\ endonuclease
+
+PAS\ 2
+PAS2
+
+HBB\ 3HS1
+3HS1
+HBB3HS1
+5aHIF\ 1A
+5aHIF1A
+5aHIF1alpha
+3aHIF\ 1A
+3aHIF1A
+hnRNPH
+HNRPH
+HSP70B
+
+DXP1
+ILDR1alpha
+KHDRBS2\ 3UTR\ overlapping\ transcript\ 1
+C\ K\ RAS
+NABP1\ 3UTR\ overlapping\ transcript\ 1
+5\ nucleotidase,\ cytosolic\ IA
+5\ nucleotidase,\ cytosolic\ IB
+5\ nucleotidase,\ cytosolic\ II
+5\ nucleotidase,\ cytosolic\ IIIA
+P5N\ 1
+P5N1
+5\ nucleotidase,\ cytosolic\ IIIB
+5,\ 3\ nucleotidase,\ cytosolic
+5\ nucleotidase\ domain\ containing\ 1
+5\ nucleotidase\ domain\ containing\ 2
+
+5\ nucleotidase\ domain\ containing\ 3
+5\ nucleotidase\ domain\ containing\ 4
+
+5\ nucleotidase\ ecto
+5,3\ nucleotidase,\ mitochondrial
+2\ 5\ oligoadenylate\ synthetase\ 1
+2\ 5\ oligoadenylate\ synthetase\ 2
+
+2\ 5\ oligoadenylate\ synthetase\ 3
+2\ 5\ oligoadenylate\ synthetase\ like
+HOR5Beta3
+HOR5Beta1
+HOR5Beta5
+HOR5Beta6
+HOR5Beta8
+HOR5Beta7
+AGP\ B
+AGPB
+3\ phosphoadenosine\ 5\ phosphosulfate\ synthase\ 1
+3\ phosphoadenosine\ 5\ phosphosulfate\ synthase\ 2
+2\ PDE
+2PDE
+GPIIA
+PIF1\ 5\ to\ 3\ DNA\ helicase
+
+polynucleotide\ kinase\ 3\ phosphatase
+
+pyridoxamine\ 5\ phosphate\ oxidase
+
+protein\ phosphatase\ 2\ regulatory\ subunit\ Balpha
+
+protein\ phosphatase\ 2\ regulatory\ subunit\ Bbeta
+
+protein\ phosphatase\ 2\ regulatory\ subunit\ Bgamma
+protein\ phosphatase\ 2\ regulatory\ subunit\ Balpha
+
+protein\ phosphatase\ 2\ regulatory\ subunit\ Bbeta
+
+protein\ phosphatase\ 2\ regulatory\ subunit\ Bgamma
+
+protein\ phosphatase\ 2\ regulatory\ subunit\ Bdelta
+
+protein\ phosphatase\ 2\ regulatory\ subunit\ Bepsilon
+
+pseudouridine\ 5\ phosphatase
+
+REX4\ homolog,\ 3\ 5\ exonuclease
+RNA\ guanylyltransferase\ and\ 5\ phosphatase
+
+RNA\ 3\ terminal\ phosphate\ cyclase
+RNA\ 2,3\ cyclic\ phosphate\ and\ 5\ OH\ ligase
+
+U50
+small\ nuclear\ ribonucleoprotein\ polypeptide\ A
+U2A
+
+U2B
+
+Sm\ B/B
+SmB/B
+SmB/SmB
+3\ Tab1
+3Tab1
+5\ 3\ exoribonuclease\ 1
+5\ 3\ exoribonuclease\ 2
+
+3OY11.1
+5OY11.1
+AND\ 1
+A\ 2
+AT\ 1
+INSULIN
+G\ 21
+AND\ 1
+A\ 2
+AT\ 1
+AND\ 1
+A\ 2
+AT\ 1
+AND\ 1
+A\ 2
+AT\ 1
+AND\ 1
+A\ 2
+AT\ 1
+AND\ 1
+A\ 2
+AT\ 1
+INSULIN
+G\ 21
+ACTH
+AND\ 1
+A\ 2
+AT\ 1
+INSULIN
+G\ 21
+ACTH
+BETA1
+BETA\ 1
+BETA1
+A\ BETA
+AND\ 1
+A\ 2
+AT\ 1
+INSULIN
+G\ 21
+ACTH
+BETA1
+BETA\ 1
+BETA1
+A\ BETA
+PROTEINS
+ALPHA4
+ALPHA4
+AND\ 34
+AND34
+NEUROPEPTIDES	226
+
+GLUCAGON
+3.8\ 1
+3.81
+I\ 1
+BETA\ 4
+AP\ 5

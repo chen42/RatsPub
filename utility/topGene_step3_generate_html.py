@@ -28,7 +28,7 @@ with open("./topGeneAbstractCount.tab" ,"r") as gc:
         pmid_cnt, symb=line.strip().split()
         out+= symb+"\t"+geneNames[symb]+"\n"
         html+="<li><a href=\"/showTopGene?topGene="+symb+"\">"+symb+"</a> <span style=\"font-size:small; color:grey\">("+geneNames[symb]+")</span><br>\n"
-        if cnt==200:
+        if cnt==100:
             break
 
 with open("topGene_symb_alias.txt", "w+")  as tg:
