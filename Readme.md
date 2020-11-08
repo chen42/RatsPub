@@ -1,6 +1,8 @@
 # RatsPub: Relationship with Addiction Through Searches of PubMed
 
-http://rats.pub
+URL: [http://rats.pub](http://rats.pub)
+
+Manuscript: [BioRxiv](https://www.biorxiv.org/content/10.1101/2020.09.17.297358v2)
 
 RatsPub searches PubMed to find sentences that contain the query terms (e.g., gene symbols) and a drug addiction related keyword. Over 300 of these keywords are organized into six categories:
 * names of abused drugs, e.g., opioids
