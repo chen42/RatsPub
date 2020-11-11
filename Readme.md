@@ -28,5 +28,18 @@ Live searches are conducted through PubMed to get relevant PMIDs, which are then
 * python flask
 * python nltk
 
+## Mini PubMed for testing
+
+For testing or code development, it is useful to have a small collection of PubMed abstracts in the same format as the local PubMed mirror. We provid 2473 abstracts that can be used to test four gene symbols (gria1, crhr1, drd2, and penk).
+
+1. install [edirect](https://dataguide.nlm.nih.gov/edirect/install.html) (make sure you refresh your shell after install so the PATH is updated) 
+2. unpack the minipubmed.tgz file
+3. test the installation by running: 
+```
+cd minipubmed
+cat pmid.list |fetch-PubMed  -path PubMed/Archive/ >test.xml
+```
+You should see 2473 abstracts in the test.xml file.
+
 ## planned
 * NLP analysis of the senences (topic modeling, ranking, etc.)
