@@ -42,4 +42,4 @@ cat pmid.list |fetch-PubMed  -path PubMed/Archive/ >test.xml
 You should see 2473 abstracts in the test.xml file.
 
 ## planned
-* NLP analysis of the senences (topic modeling, ranking, etc.)
+* NLP analysis of the sentences (topic modeling, ranking, etc.)
