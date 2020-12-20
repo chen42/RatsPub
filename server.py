@@ -227,13 +227,16 @@ def progress():
     #get the type from checkbox
     search_type = request.args.getlist('type')
     if (search_type == []):
-        search_type = ['GWAS', 'function', 'addiction', 'drug', 'brain', 'stress', 'psychiatric']
+        search_type = ['GWAS', 'function', 'addiction', 'drug', 'brain', 'stress', 'psychiatric', 'cell']
     session['search_type'] = search_type
     # only 1-100 terms are allowed
     genes=request.args.get('query')
     genes=genes.replace(",", " ")
     genes=genes.replace(";", " ")
     genes=re.sub(r'\bLOC\d*?\b', "", genes, flags=re.I)
+    genes=genes.replace(" \'", " \"")
+    genes=genes.replace("\' ", "\" ")
+    genes=genes.replace("\'", "-")
     genes1 = [f[1:-1] for f in re.findall('".+?"', genes)]
     genes2 = [p for p in re.findall(r'([^""]+)',genes) if p not in genes1]
     genes2_str = ''.join(genes2)
@@ -241,10 +244,10 @@ def progress():
     genes3 = genes1 + genes2
     genes = [re.sub("\s+", '-', s) for s in genes3]
 
-    if len(genes)>=30:
-        message="<span class='text-danger'>Up to 30 terms can be searched at a time</span>"
-        return render_template('index.html', message=message)
-    elif len(genes)==0:
+    #if len(genes)>=30:
+    #    message="<span class='text-danger'>Up to 30 terms can be searched at a time</span>"
+    #    return render_template('index.html', message=message)
+    if len(genes)==0:
         message="<span class='text-danger'>Please enter a search term </span>"
         return render_template('index.html', message=message)
     tf_path=tempfile.gettempdir()
@@ -337,9 +340,12 @@ def search():
     if ("psychiatric" in search_type):
         temp_nodes += n5  
         json_nodes += nj5   
-    if ("GWAS" in search_type):
+    if ("cell" in search_type):
         temp_nodes += n6  
-        json_nodes += nj6
+        json_nodes += nj6   
+    if ("GWAS" in search_type):
+        temp_nodes += n7  
+        json_nodes += nj7
     json_nodes = json_nodes[:-2]
     json_nodes =json_nodes+"]}"
 
@@ -395,9 +401,16 @@ def search():
                 yield "data:"+str(progress)+"\n\n"
                 e5=generate_edges(sent5, tf_name)
                 ej5=generate_edges_json(sent5, tf_name)
+                # cell 
+                cell=undic(cell_d)
+                sent6=gene_category(gene, cell_d, cell, "cell")
+                progress+=percent
+                yield "data:"+str(progress)+"\n\n"
+                e6=generate_edges(sent6, tf_name)
+                ej6=generate_edges_json(sent6, tf_name)
                 # GWAS
-                e6=searchArchived('GWAS', gene, 'cys')
-                ej6=searchArchived('GWAS', gene , 'json')
+                e7=searchArchived('GWAS', gene, 'cys')
+                ej7=searchArchived('GWAS', gene , 'json')
                 #consider the types got from checkbox
                 geneEdges = ""
                 if ("addiction" in search_type):
@@ -418,9 +431,12 @@ def search():
                 if ("psychiatric" in search_type):
                     geneEdges += e5  
                     json_edges += ej5  
-                if ("GWAS" in search_type):
+                if ("cell" in search_type):
                     geneEdges += e6  
-                    json_edges += ej6                           
+                    json_edges += ej6  
+                if ("GWAS" in search_type):
+                    geneEdges += e7  
+                    json_edges += ej7                           
                 if len(geneEdges) >1:
                     edges+=geneEdges
                     nodes+="{ data: { id: '" + gene +  "', nodecolor:'#E74C3C', fontweight:700, url:'/synonyms?node="+gene+"'} },\n"
@@ -787,7 +803,7 @@ def showTopGene():
 @app.route("/shownode")
 def shownode():
     node=request.args.get('node')
-    allnodes={**brain_d, **drug_d, **function_d, **addiction_d, **stress_d, **psychiatric_d}
+    allnodes={**brain_d, **drug_d, **function_d, **addiction_d, **stress_d, **psychiatric_d, **cell_d}
     out="<p>"+node.upper()+"<hr><li>"+ allnodes[node].replace("|", "<li>")
     return render_template('sentences.html', sentences=out+"<p>")
 
@@ -908,4 +924,4 @@ def top150genes():
 
 if __name__ == '__main__':
     db.create_all()
-    app.run(debug=True, port=4201)
+    app.run(debug=True, port=4200)
