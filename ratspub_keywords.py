@@ -38,6 +38,12 @@ psychiatric_d={'anxiety':'anxiety|anxious',
 'impulsivity':'5-CSRTT|5-choice-task|delay-discounting|delay-exposure|delay-intolerance|delayed-reward|delay-task|five-choice-serial-reaction-time-task|impulsive|impulsivity|premature-responding',
 'schizophrenia':'schizophrenia'}
 
+cell_d={'neuron':'neuron|neuronal|glutamatergic|gabaergic|dopaminergic|serotonergic|neurons|interneurons|interneuron|cholinergic|nitrergic|GABA',
+'astrocyte':'astrocyte|astrocytic|astrocytes|astroglia|astroglial',
+'microglia':'microglia|microglial',
+'endothelium':'endothelium|endothelial',
+'oligodendrocyte':'oligodendrocyte|oligodendrocytes'}
+
 stress_d={'PTSD':'PTSD|post-traumatic-stress|post-traumatic-stress-symptoms|post-traumatic-stress-disorder',
 'stress':'distress|psychological-trauma|stress'}
 
