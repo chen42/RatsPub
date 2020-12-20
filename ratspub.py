@@ -144,7 +144,7 @@ drug=undic(drug_d)
 
 gene_s=undic(genes)
 
-nodecolor={'function':"#A9CCE3", 'addiction': "#D7BDE2", 'drug': "#F9E79F", 'brain':"#A3E4D7", 'GWAS':"#AEB6BF", 'stress':"#EDBB99", 'psychiatric':"#F5B7B1"}
+nodecolor={'function':"#A9CCE3", 'addiction': "#D7BDE2", 'drug': "#F9E79F", 'brain':"#A3E4D7", 'GWAS':"#AEB6BF", 'stress':"#EDBB99", 'psychiatric':"#F5B7B1", 'cell':"#B1F5B7"}
 #https://htmlcolorcodes.com/ third column down
 
 n0=generate_nodes(function_d, 'function')
@@ -153,7 +153,8 @@ n2=generate_nodes(drug_d, 'drug')
 n3=generate_nodes(brain_d, 'brain')
 n4=generate_nodes(stress_d, 'stress')
 n5=generate_nodes(psychiatric_d, 'psychiatric')
-n6=''
+n6=generate_nodes(cell_d, 'cell')
+n7=''
 
 nj0=generate_nodes_json(function_d, 'function')
 nj1=generate_nodes_json(addiction_d, 'addiction')
@@ -161,7 +162,8 @@ nj2=generate_nodes_json(drug_d, 'drug')
 nj3=generate_nodes_json(brain_d, 'brain')
 nj4=generate_nodes_json(stress_d, 'stress')
 nj5=generate_nodes_json(psychiatric_d, 'psychiatric')
-nj6=''
+nj6=generate_nodes_json(cell_d, 'cell')
+nj7=''
 
 pubmed_path=os.environ["EDIRECT_PUBMED_MASTER"]
 
