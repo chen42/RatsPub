@@ -20,6 +20,7 @@ numpy==1.18.1
 protobuf==3.11.3
 pycparser==2.19
 PyYAML==5.3
+pytz==2020.4
 scipy==1.4.1
 setuptools==39.1.0
 six==1.14.0
