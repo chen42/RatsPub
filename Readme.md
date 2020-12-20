@@ -25,8 +25,8 @@ Live searches are conducted through PubMed to get relevant PMIDs, which are then
 ## dependencies
 
 * [local copy of PubMed](https://dataguide.nlm.nih.gov/edirect/archive.html)
-* python flask
-* python nltk
+* python == 3.6 (because we are using tensorflow 1.9.0)
+* see requirements.txt for list of packages and versions 
 
 ## Mini PubMed for testing
 
