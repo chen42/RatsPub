@@ -125,12 +125,12 @@ def signup():
         found_user = users.query.filter_by(email=email).first()
         if (found_user and (bcrypt.checkpw(password.encode('utf8'), found_user.password)==False)):
             flash("Already registered, but wrong password!", "loginout")
-            return render_template('signup.html')        
+            return render_template('signup.html')
         session['email'] = email
         session['hashed_email'] = hashlib.md5(session['email'] .encode('utf-8')).hexdigest()
         session['name'] = name
         password = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
-        user = users(name=name, email=email, password = password)       
+        user = users(name=name, email=email, password = password)
         if found_user:
             session['email'] = found_user.email
             session['hashed_email'] = hashlib.md5(session['email'] .encode('utf-8')).hexdigest()
@@ -319,15 +319,15 @@ def search():
     sntdata=open(snt_file,"w+")
     zeroLinkNode=open(sessionpath+"_0link","w+")
     search_type = session['search_type']
-    #consider the types got from checkbox
+    #consider the types from checkbox
     temp_nodes = ""
     json_nodes = "{\"data\":["
     if ("function" in search_type):
         temp_nodes += n0
         json_nodes += nj0
     if ("addiction" in search_type):
-        temp_nodes += n1   
-        json_nodes += nj1    
+        temp_nodes += n1
+        json_nodes += nj1
     if ("drug" in search_type):
         temp_nodes += n2
         json_nodes += nj2
@@ -338,13 +338,13 @@ def search():
         temp_nodes += n4
         json_nodes += nj4
     if ("psychiatric" in search_type):
-        temp_nodes += n5  
-        json_nodes += nj5   
+        temp_nodes += n5
+        json_nodes += nj5
     if ("cell" in search_type):
-        temp_nodes += n6  
-        json_nodes += nj6   
+        temp_nodes += n6
+        json_nodes += nj6
     if ("GWAS" in search_type):
-        temp_nodes += n7  
+        temp_nodes += n7
         json_nodes += nj7
     json_nodes = json_nodes[:-2]
     json_nodes =json_nodes+"]}"
@@ -417,8 +417,8 @@ def search():
                     geneEdges += e0
                     json_edges += ej0
                 if ("drug" in search_type):
-                    geneEdges += e1   
-                    json_edges += ej1    
+                    geneEdges += e1
+                    json_edges += ej1
                 if ("function" in search_type):
                     geneEdges += e2
                     json_edges += ej2
@@ -429,33 +429,34 @@ def search():
                     geneEdges += e4
                     json_edges += ej4
                 if ("psychiatric" in search_type):
-                    geneEdges += e5  
-                    json_edges += ej5  
+                    geneEdges += e5
+                    json_edges += ej5
                 if ("cell" in search_type):
-                    geneEdges += e6  
-                    json_edges += ej6  
+                    geneEdges += e6
+                    json_edges += ej6
                 if ("GWAS" in search_type):
-                    geneEdges += e7  
-                    json_edges += ej7                           
+                    geneEdges += e7
+                    json_edges += ej7
                 if len(geneEdges) >1:
                     edges+=geneEdges
                     nodes+="{ data: { id: '" + gene +  "', nodecolor:'#E74C3C', fontweight:700, url:'/synonyms?node="+gene+"'} },\n"
                 else:
                     nodesToHide+=gene +  " "
-                sentences+=sent0+sent1+sent2+sent3+sent4+sent5
-                sent0=None 
+                sentences+=sent0+sent1+sent2+sent3+sent4+sent5+sent6
+                sent0=None
                 sent1=None
                 sent2=None
                 sent3=None
                 sent4=None
                 sent5=None
+                sent6=None
                 #save data before the last yield
                 searchCnt+=1
                 if (searchCnt==len(genes)):
                     progress=100
                     sntdata.write(sentences)
                     sntdata.close()
-                    cysdata.write(nodes+edges)               
+                    cysdata.write(nodes+edges)
                     cysdata.close()
                     zeroLinkNode.write(nodesToHide)
                     zeroLinkNode.close()
@@ -466,7 +467,7 @@ def search():
             json_edges =json_edges+"]}"
             #write edges to txt file in json format also in user folder
             with open(path_user+"edges.json", "w") as temp_file_edges:
-                temp_file_edges.write(json_edges) 
+                temp_file_edges.write(json_edges)
     with open(path_user+"nodes.json", "w") as temp_file_nodes:
         temp_file_nodes.write(json_nodes)
     return Response(generate(genes, snt_file), mimetype='text/event-stream')

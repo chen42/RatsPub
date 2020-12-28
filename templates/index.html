@@ -7,7 +7,6 @@
 <table>
 	<tr><td >
 			<p> RatsPub is a tool to efficiently and comprehensively answer the question <b>"What do we know about these genes and addiction?".  </b>
-
 			<p>RatsPub answers this question by searching PubMed to find <i>sentences</i> containing the query terms (i.e., gene symbols) and <a href="https://github.com/chen42/RatsPub/blob/master/ratspub_keywords.py">over 300 drug addiction-related keywords</a> that are organized into six categories. Data from <a href="https://www.ebi.ac.uk/gwas/">NHGRI-EBI GWAS catalog </a>are also included in the search. These gene-keyword relationships are presented as an interactive graph and a table.	
 			<p>Gene alias often include non-specific words and are thus not included in the initial search. However, a list of alias can be found by clicking on the gene symbol in the results section. These alias then can be searched with a single click.  
 			<p>
@@ -27,14 +26,16 @@ You can create an account if you need to save your results. Up to 30 gene symbol
 			<div class="col-sm-10">
 				<strong>Please choose keyword categories to be included in the search:</strong>
 				<label>
-				<input type="checkbox" name="type" value="GWAS" checked> Human GWAS 	
+					<div style="font-size:120%">
 				<input type="checkbox" name="type" value="addiction" checked> Addiction Stage 				
-				<input type="checkbox" name="type" value="drug" checked> Drugs		
 				<input type="checkbox" name="type" value="brain" checked> Brain Region				
-				<input type="checkbox" name="type" value="stress" checked> Stress				
-				<input type="checkbox" name="type" value="psychiatric" checked> Psychiatric Diseases
 				<input type="checkbox" name="type" value="cell" checked> CNS Cell Type
+				<input type="checkbox" name="type" value="drug" checked> Drugs		
 				<input type="checkbox" name="type" value="function" checked> Function				
+				<input type="checkbox" name="type" value="GWAS" checked> Human GWAS 	
+				<input type="checkbox" name="type" value="psychiatric" checked> Psychiatric Diseases
+				<input type="checkbox" name="type" value="stress" checked> Stress				
+				   </div>
 				</label>
 			</div>
 			<textarea name="query" class="form-control form-control-lg" type="search" row="3" id="searchform"></textarea>
