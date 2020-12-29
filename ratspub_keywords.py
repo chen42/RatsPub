@@ -9,7 +9,7 @@ addiction_d={'addiction':'addiction|addictive|compulsive|drug abuse|escalation|p
 
 brain_d={'accumbens':'acbc|acbs|accumbal|accumbens|core|Nacc|NacSh|shell',
 'amygdala':'amy|amygdala|bla|cea|cna',
-'cortex':'cerebral|cingulate|cortex|cortico limbic|corticolimbic|corticostriatal|infralimbic|insula|insular|mPFC|orbitofrontal|pfc|prefrontal|prelimbic|prl|vmpfc',
+'cortex':'cerebral|cingulate|cortex|cortico limbic|corticolimbic|corticostriatal|infralimbic|insular*|mPFC|orbitofrontal|pfc|prefrontal|prelimbic|prl|vmpfc',
 'habenula':'habenula|lhb|mhb',
 'hippocampus':'ca1|ca3|dentate gyrus|dhpc|hip|hipp|hippocampal|hippocampus|subiculum|vhipp|vhpc',
 'hypothalamus':'hypothalamic|hypothalamus|LHA|paraventricular nucleus|PVN',
@@ -38,7 +38,7 @@ psychiatric_d={'anxiety':'anxiety|anxious',
 'impulsivity':'5 CSRTT|5 choice task|delay discounting|delay exposure|delay intolerance|delayed reward|delay task|five choice serial reaction time task|impulsive|impulsivity|premature responding',
 'schizophrenia':'schizophrenia'}
 
-cell_d={'neuron':'adrenergic neurons*|cholinergic neurons*|dopaminergic neurons*|gabaergic neurons*|glutamatergic neurons*|GnRH neurons*|interneurons*|interneurons*|monoaminergic neurons*|medium spiny neurons*|motor neurons*|neuronal cells*|nitrergic neurons*|noradrenergic neurons*|projection neurons*|pyramidal neurons*|sensory neurons*|serotonergic neurons*|somatostatin neurons*|neurons*|excitatory neurons*|inhibitary neurons*|corticospinal neurons*|dopamine neurons*|D1 neurons*|D2 neurons*|afferent neurons*|efferent neurons*|serotonin neurons*|cortical neurons*|hippocampal neurons*|DA neurons*|CNS neurons*|cortex neurons*|mesencephalic neurons*|orexin neurons*|catecholaminergic neurons*|striatal neurons*',
+cell_d={'neuron':'adrenergic neurons*|cholinergic neurons*|dopaminergic neurons*|gabaergic neurons*|glutamatergic neurons*|GnRH neurons*|interneurons*|monoaminergic neurons*|medium spiny neurons*|motor neurons*|neuronal cells*|nitrergic neurons*|noradrenergic neurons*|projection neurons*|pyramidal neurons*|sensory neurons*|serotonergic neurons*|somatostatin neurons*|neurons*|excitatory neurons*|inhibitory neurons*|corticospinal neurons*|dopamine neurons*|D1 neurons*|D2 neurons*|afferent neurons*|efferent neurons*|serotonin neurons*|cortical neurons*|hippocampal neurons*|DA neurons*|CNS neurons*|cortex neurons*|mesencephalic neurons*|orexin neurons*|catecholaminergic neurons*|striatal neurons*|bipolar neurons*|ganglion cells*|RGC|horizontal cells*|amacrine cells*',
 'astrocyte':'astrocytic|astrocytes*|astroglia|astroglial',
 'microglia':'microglia|microglial',
 'endothelium':'endothelium|endothelial cells*',
