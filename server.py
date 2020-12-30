@@ -303,7 +303,7 @@ def progress():
 def search():
     genes=session['query']
     timeextension=session['timeextension']
-    percent=round(100/(len(genes)*6),1) # 6 categories 
+    percent=round(100/(len(genes)*8),1) # 7 categories + 1 in the beginning
     if ('email' in session):
         sessionpath = session['path_user'] + timeextension
         path_user=session['path_user']
@@ -358,12 +358,14 @@ def search():
             searchCnt=0
             nodesToHide=str()
             json_edges = str()
+
+            progress+=percent
             
             genes_or = ' or '.join(genes)
             all_d=undic(addiction_d) +"|"+undic(drug_d)+"|"+undic(function_d)+"|"+undic(brain_d)+"|"+undic(stress_d)+"|"+undic(psychiatric_d)+"|"+undic(cell_d)
             #print(all_d)
             abstracts_raw = getabstracts(genes_or,all_d)
-
+            progress+=percent
             sentences_ls=[]
             for row in abstracts_raw.split("\n"):
                 tiab=row.split("\t")
