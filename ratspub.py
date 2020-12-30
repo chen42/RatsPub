@@ -4,6 +4,7 @@ import os
 import re
 from ratspub_keywords import *
 from gene_synonyms import *
+import time
 
 global function_d, brain_d, drug_d, addiction_d, brain_query_term, pubmed_path, genes
 
@@ -14,25 +15,36 @@ def undic(dic):
 def findWholeWord(w):
     return re.compile(r'\b({0})\b'.format(w), flags=re.IGNORECASE).search
 
-def getSentences(query, gene):
+
+def getabstracts(gene,query):
+    query="\"(" + query.replace("|", " OR ")  + ") AND " + gene + "\""
     abstracts = os.popen("esearch -db pubmed -query " +  query + " | efetch -format uid |fetch-pubmed -path "+ pubmed_path + " | xtract -pattern PubmedArticle -element MedlineCitation/PMID,ArticleTitle,AbstractText|sed \"s/-/ /g\"").read()
+    return(abstracts)
+sentences_ls=[]
+def getSentences(gene, sentences_ls):
+    #abstracts = os.popen("esearch -db pubmed -query " +  query + " | efetch -format uid |fetch-pubmed -path "+ pubmed_path + " | xtract -pattern PubmedArticle -element MedlineCitation/PMID,ArticleTitle,AbstractText|sed \"s/-/ /g\"").read()
+    start = time.time()
     out=str()
-    for row in abstracts.split("\n"):
-        tiab=row.split("\t")
-        pmid = tiab.pop(0)
-        tiab= " ".join(tiab)
-        sentences = sent_tokenize(tiab)
-        ## keep the sentence only if it contains the gene 
-        for sent in sentences:
-            if findWholeWord(gene)(sent):
-                sent=re.sub(r'\b(%s)\b' % gene, r'<strong>\1</strong>', sent, flags=re.I)
-                out+=pmid+"\t"+sent+"\n"
+
+    ## keep the sentence only if it contains the gene 
+    for sent in sentences_ls:
+        #if findWholeWord(gene)(sent):
+        #for sent in sente:
+        if gene.lower() in sent.lower():
+            #print(sent)
+            pmid = sent.split(' ')[0]
+            sent = sent.split(' ',1)[1]
+            sent=re.sub(r'\b(%s)\b' % gene, r'<strong>\1</strong>', sent, flags=re.I)
+            out+=pmid+"\t"+sent+"\n"
+            #out+="\t"+sent+"\n"
+    #print(out)
+
     return(out)
 
-def gene_category(gene, cat_d, query, cat):
+def gene_category(gene, cat_d, query, cat, abstracts):
     #e.g. BDNF, addiction_d, undic(addiction_d) "addiction"
     q="\"(" + query.replace("|", " OR ")  + ") AND " + gene + "\""
-    sents=getSentences(q, gene)
+    sents=getSentences(gene, abstracts)
     out=str()
     for sent in sents.split("\n"):
         for key in cat_d:
@@ -137,10 +149,10 @@ def searchArchived(sets, query, filetype):
     else:
         return(gwas_json)
 # brain region has too many short acronyms to just use the undic function, so search PubMed using the following 
-brain_query_term="cortex|accumbens|striatum|amygadala|hippocampus|tegmental|mesolimbic|infralimbic|prelimbic|habenula"
-function=undic(function_d)
-addiction=undic(addiction_d)
-drug=undic(drug_d)
+#brain_query_term="cortex|accumbens|striatum|amygadala|hippocampus|tegmental|mesolimbic|infralimbic|prelimbic|habenula"
+#function=undic(function_d)
+#addiction=undic(addiction_d)
+#drug=undic(drug_d)
 
 gene_s=undic(genes)
 
