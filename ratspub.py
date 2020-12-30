@@ -156,8 +156,8 @@ def searchArchived(sets, query, filetype):
 
 gene_s=undic(genes)
 
-nodecolor={'function':"#A9CCE3", 'addiction': "#D7BDE2", 'drug': "#F9E79F", 'brain':"#A3E4D7", 'GWAS':"#AEB6BF", 'stress':"#EDBB99", 'psychiatric':"#F5B7B1", 'cell':"#B1F5B7"}
-#https://htmlcolorcodes.com/ third column down
+nodecolor={'function':"#A9CCE3", 'addiction': "#F5B7B1", 'drug': "#D7BDE2", 'brain':"#D4EFDF", 'GWAS':"#D5DBDB", 'stress':"#FAD7A0", 'psychiatric':"#F9E79F", 'cell':"#ABEBC6"}
+#https://htmlcolorcodes.com/color-chart flat design third row 
 
 n0=generate_nodes(function_d, 'function')
 n1=generate_nodes(addiction_d, 'addiction')
