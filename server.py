@@ -125,12 +125,12 @@ def signup():
         found_user = users.query.filter_by(email=email).first()
         if (found_user and (bcrypt.checkpw(password.encode('utf8'), found_user.password)==False)):
             flash("Already registered, but wrong password!", "loginout")
-            return render_template('signup.html')
+            return render_template('signup.html')        
         session['email'] = email
         session['hashed_email'] = hashlib.md5(session['email'] .encode('utf-8')).hexdigest()
         session['name'] = name
         password = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
-        user = users(name=name, email=email, password = password)
+        user = users(name=name, email=email, password = password)       
         if found_user:
             session['email'] = found_user.email
             session['hashed_email'] = hashlib.md5(session['email'] .encode('utf-8')).hexdigest()
@@ -319,15 +319,15 @@ def search():
     sntdata=open(snt_file,"w+")
     zeroLinkNode=open(sessionpath+"_0link","w+")
     search_type = session['search_type']
-    #consider the types from checkbox
+    #consider the types got from checkbox
     temp_nodes = ""
     json_nodes = "{\"data\":["
     if ("function" in search_type):
         temp_nodes += n0
         json_nodes += nj0
     if ("addiction" in search_type):
-        temp_nodes += n1
-        json_nodes += nj1
+        temp_nodes += n1   
+        json_nodes += nj1    
     if ("drug" in search_type):
         temp_nodes += n2
         json_nodes += nj2
@@ -338,13 +338,13 @@ def search():
         temp_nodes += n4
         json_nodes += nj4
     if ("psychiatric" in search_type):
-        temp_nodes += n5
-        json_nodes += nj5
+        temp_nodes += n5  
+        json_nodes += nj5   
     if ("cell" in search_type):
-        temp_nodes += n6
-        json_nodes += nj6
+        temp_nodes += n6  
+        json_nodes += nj6   
     if ("GWAS" in search_type):
-        temp_nodes += n7
+        temp_nodes += n7  
         json_nodes += nj7
     json_nodes = json_nodes[:-2]
     json_nodes =json_nodes+"]}"
@@ -358,6 +358,23 @@ def search():
             searchCnt=0
             nodesToHide=str()
             json_edges = str()
+            
+            genes_or = ' or '.join(genes)
+            all_d=undic(addiction_d) +"|"+undic(drug_d)+"|"+undic(function_d)+"|"+undic(brain_d)+"|"+undic(stress_d)+"|"+undic(psychiatric_d)+"|"+undic(cell_d)
+            #print(all_d)
+            abstracts_raw = getabstracts(genes_or,all_d)
+
+            sentences_ls=[]
+            for row in abstracts_raw.split("\n"):
+                tiab=row.split("\t")
+                #print(tiab)
+                pmid = tiab.pop(0)
+                tiab= " ".join(tiab)
+                sentences_tok = sent_tokenize(tiab)
+                for sent_tok in sentences_tok:
+                    sent_tok = pmid + ' ' + sent_tok
+                    sentences_ls.append(sent_tok)
+
             for gene in genes:
                 gene=gene.replace("-"," ")
                 # report progress immediately
@@ -365,45 +382,47 @@ def search():
                 yield "data:"+str(progress)+"\n\n"
                 #addiction terms must present with at least one drug
                 addiction=undic(addiction_d) +") AND ("+undic(drug_d)
-                sent0=gene_category(gene, addiction_d, addiction, "addiction")
+                sent0=gene_category(gene, addiction_d, addiction, "addiction", sentences_ls)
+                #print(sent0)
                 e0=generate_edges(sent0, tf_name)
                 ej0=generate_edges_json(sent0, tf_name)
                 # drug
                 drug=undic(drug_d)
-                sent1=gene_category(gene, drug_d, drug, "drug")
+                sent1=gene_category(gene, drug_d, drug, "drug", sentences_ls)
                 progress+=percent
                 yield "data:"+str(progress)+"\n\n"
                 e1=generate_edges(sent1, tf_name)
                 ej1=generate_edges_json(sent1, tf_name)
                 # function
                 function=undic(function_d)
-                sent2=gene_category(gene, function_d, function, "function")
+                sent2=gene_category(gene, function_d, function, "function", sentences_ls)
                 progress+=percent
                 yield "data:"+str(progress)+"\n\n"
                 e2=generate_edges(sent2, tf_name)
                 ej2=generate_edges_json(sent2, tf_name)
                 # brain has its own query terms that does not include the many short acronyms
-                sent3=gene_category(gene, brain_d, brain_query_term, "brain")
+                brain = undic(brain_d)
+                sent3=gene_category(gene, brain_d, brain, "brain", sentences_ls)
                 progress+=percent
                 e3=generate_edges(sent3, tf_name)
                 ej3=generate_edges_json(sent3, tf_name)
                 # stress
                 stress=undic(stress_d)
-                sent4=gene_category(gene, stress_d, stress, "stress")
+                sent4=gene_category(gene, stress_d, stress, "stress", sentences_ls)
                 progress+=percent
                 yield "data:"+str(progress)+"\n\n"
                 e4=generate_edges(sent4, tf_name)
                 ej4=generate_edges_json(sent4, tf_name)
                 # psychiatric 
                 psychiatric=undic(psychiatric_d)
-                sent5=gene_category(gene, psychiatric_d, psychiatric, "psychiatric")
+                sent5=gene_category(gene, psychiatric_d, psychiatric, "psychiatric", sentences_ls)
                 progress+=percent
                 yield "data:"+str(progress)+"\n\n"
                 e5=generate_edges(sent5, tf_name)
                 ej5=generate_edges_json(sent5, tf_name)
                 # cell 
                 cell=undic(cell_d)
-                sent6=gene_category(gene, cell_d, cell, "cell")
+                sent6=gene_category(gene, cell_d, cell, "cell", sentences_ls)
                 progress+=percent
                 yield "data:"+str(progress)+"\n\n"
                 e6=generate_edges(sent6, tf_name)
@@ -417,8 +436,8 @@ def search():
                     geneEdges += e0
                     json_edges += ej0
                 if ("drug" in search_type):
-                    geneEdges += e1
-                    json_edges += ej1
+                    geneEdges += e1   
+                    json_edges += ej1    
                 if ("function" in search_type):
                     geneEdges += e2
                     json_edges += ej2
@@ -429,21 +448,21 @@ def search():
                     geneEdges += e4
                     json_edges += ej4
                 if ("psychiatric" in search_type):
-                    geneEdges += e5
-                    json_edges += ej5
+                    geneEdges += e5  
+                    json_edges += ej5  
                 if ("cell" in search_type):
-                    geneEdges += e6
-                    json_edges += ej6
+                    geneEdges += e6  
+                    json_edges += ej6  
                 if ("GWAS" in search_type):
-                    geneEdges += e7
-                    json_edges += ej7
+                    geneEdges += e7  
+                    json_edges += ej7                           
                 if len(geneEdges) >1:
                     edges+=geneEdges
                     nodes+="{ data: { id: '" + gene +  "', nodecolor:'#E74C3C', fontweight:700, url:'/synonyms?node="+gene+"'} },\n"
                 else:
                     nodesToHide+=gene +  " "
                 sentences+=sent0+sent1+sent2+sent3+sent4+sent5+sent6
-                sent0=None
+                sent0=None 
                 sent1=None
                 sent2=None
                 sent3=None
@@ -456,7 +475,7 @@ def search():
                     progress=100
                     sntdata.write(sentences)
                     sntdata.close()
-                    cysdata.write(nodes+edges)
+                    cysdata.write(nodes+edges)               
                     cysdata.close()
                     zeroLinkNode.write(nodesToHide)
                     zeroLinkNode.close()
@@ -467,7 +486,7 @@ def search():
             json_edges =json_edges+"]}"
             #write edges to txt file in json format also in user folder
             with open(path_user+"edges.json", "w") as temp_file_edges:
-                temp_file_edges.write(json_edges)
+                temp_file_edges.write(json_edges) 
     with open(path_user+"nodes.json", "w") as temp_file_nodes:
         temp_file_nodes.write(json_nodes)
     return Response(generate(genes, snt_file), mimetype='text/event-stream')
@@ -899,6 +918,7 @@ def gene_gene():
                 sentword="sentence"
             else:
                 sentword="sentences"
+            print(sentword)
             topGeneHits[ "<li> <a href=/sentences?edgeID=" + url+ " target=_new>" + "Show " + str(hitGenes[key]) + " " + sentword +" </a> about "+query+" and <a href=/showTopGene?topGene="+key+" target=_gene><span style=\"background-color:#FcF3cf\">"+key+"</span></a>" ]=hitGenes[key]
         topSorted = [(k, topGeneHits[k]) for k in sorted(topGeneHits, key=topGeneHits.get, reverse=True)]
         for k,v in topSorted:
@@ -925,4 +945,4 @@ def top150genes():
 
 if __name__ == '__main__':
     db.create_all()
-    app.run(debug=True, port=4200)
+    app.run(debug=True, port=4201)
