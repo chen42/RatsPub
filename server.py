@@ -549,7 +549,7 @@ def tableview():
     gene_name = gene_name+added
     num_gene = gene_name.count(',')+1
 
-    message3="<b> Actions: </b><li> <font color=\"#E74C3C\">Click on the abstract count to read sentences linking the keyword and the gene</font> <li> Click on a gene to search its relations with top 200 addiction genes. <li> Click on a keyword to see the terms included in the search. <li>View the results in <a href='\\cytoscape/?rnd={}&genequery={}'\ ><b> a graph.</b></a>".format(rnd_url,genes_url)
+    message3="<b> Actions: </b><li> <font color=\"#E74C3C\">Click on the abstract count to read sentences linking the keyword and the gene</font>  <li> Click on a keyword to see the terms included in the search. <li>View the results in <a href='\\cytoscape/?rnd={}&genequery={}'\ ><b> a graph.</b></a>".format(rnd_url,genes_url)
     return render_template('tableview.html', genes_session_tmp = genes_session_tmp, nodata_temp=nodata_temp, num_gene=num_gene, jedges=jedges, jnodes=jnodes,gene_name=gene_name, message3=message3, rnd_url=rnd_url, genes_url=genes_url)
 
 @app.route("/tableview0/")
@@ -699,7 +699,7 @@ def date():
             gene_name=gene_name.replace("'","")
             gene_name = gene_name+added
             num_gene = gene_name.count(',')+1
-        else: 
+        else:
             gene_name1 = gene_name1.replace("_", ", ")
             gene_name = gene_name1
             num_gene = gene_name1.count(',')+1
@@ -712,7 +712,7 @@ def date():
     else:
         flash("You logged out!")
         return render_template('index.html')
-    message3="<b> Actions: </b><li> <font color=\"#E74C3C\">Click on the abstract count to read sentences linking the keyword and the gene</font> <li> Click on a gene to search its relations with top 200 addiction genes. <li> Click on a keyword to see the terms included in the search. <li>View the results in <a href='\\cytoscape/?rnd={}&genequery={}'\ ><b> a graph.</b></a>".format(select_date,genes_session)
+    message3="<b> Actions: </b><li> <font color=\"#E74C3C\">Click on the abstract count to read sentences linking the keyword and the gene</font> <li> Click on a keyword to see the terms included in the search. <li>View the results in <a href='\\cytoscape/?rnd={}&genequery={}'\ ><b> a graph.</b></a>".format(select_date,genes_session)
     return render_template('tableview.html',nodata_temp=nodata_temp, num_gene=num_gene,genes_session_tmp = genes_session_tmp, rnd_url=select_date ,jedges=jedges, jnodes=jnodes,gene_name=gene_name, genes_url=genes_session, message3=message3)
 
 @app.route('/cytoscape/')
@@ -722,7 +722,7 @@ def cytoscape():
     tf_path=tempfile.gettempdir()
     genes_session_tmp=tf_path + "/" + genes_url
 
-    message2="<b> Actions: </b><li><font color=\"#E74C3C\">Click on a line to see the indicated number of abstracts </font> <li> Click on a gene to search its relations with top 200 addiction genes<li>Click on a keyword to see the terms included in the search<li>Hover your pointer over a node to hide other links <li>Move nodes around to adjust visibility, reload the page to restore the default layout<li>View the results in <a href='\\tableview/?rnd={}&genequery={}'\ ><b>a table. </b></a> <li>All results will appear in a new Browser window (or tab)".format(rnd_url,genes_url)
+    message2="<b> Actions: </b><li><font color=\"#E74C3C\">Click on a line to read the sentences </font> <li>Click on a keyword to see the terms included in the search<li>Hover a pointer over a node to hide other links <li>Move the nodes around to adjust visibility, reload the page to restore the default layout<li>View the results in <a href='\\tableview/?rnd={}&genequery={}'\ ><b>a table. </b></a>".format(rnd_url,genes_url)
     if ('email' in session):
         filename = rnd_url.split("_0_")[0]
         rnd_url_tmp = datadir+"/user/"+str(session['hashed_email'])+"/"+rnd_url+"/"+filename
