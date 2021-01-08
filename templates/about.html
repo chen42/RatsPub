@@ -7,11 +7,10 @@
 
 <p>RatsPub searches PubMed to find abstracts containing genes of interest and a list of curated addiction-related keywords. The abstracts corresponding to these returned PMIDs are then retrieve from a <a href="https://dataguide.nlm.nih.gov/edirect/archive.html">local archive of the PubMed</a>. No limit on the date of publication is set. Each abstract is then broken down into sentences, which are then filtered by gene names and keywords. 
 
-<p>Clicking  the links will bring up the corresponding sentences in a new browser window. Clicking the keywords will bring up the correponding search terms. Clicking the genes will start a new search to find sentences containing the target gene and the top 200 addiction genes. 
 
-<p> The top 200 addiction genes were obtained by searching 29,761 human genes against addiction related keywords. To ensure comprehensive coverage, gene alias obtained from NCBI gene database were included in the search. The results were extensively curated to remove over 900 alias that matched words that were not gene name or wrong genes. Some incorrect results remained because the same name also produced correct results. The resulting 61,000 sentences are archived localy and can be accessed via the <a href="/allTopGenes">Addiction Genes</a> link.  We also archived  5.3 million PMIDs associatd with these gene for efficient search of query gene to addiction gene relations. 
+<p> The most studied 100 addiction related genes were obtained by searching 29,761 human genes against addiction related keywords. To ensure comprehensive coverage, gene alias obtained from NCBI gene database were included in the search. The results were extensively curated to remove over 900 alias that matched words that were not gene name or wrong genes. Some incorrect results remained because the same name also produced correct results. The resulting 61,000 sentences are archived localy and can be accessed via the <a href="/allTopGenes">Addiction Genes</a> link.  We also archived  5.3 million PMIDs associated with these gene for efficient search of query gene to addiction gene relations. 
 
-<p> We also parsed the EBI GWAS catalog to obtain 23,000 genetics associations with addiction and psychiatric phenotypes. These results are included in the search by default.
+<p> We also parsed the GWAS catalog to obtain 23,000 genetics associations with addiction and psychiatric phenotypes. These results are included in the search by default.
 	
 <p> 
 We plan to update the local PubMed archive daily, the intermediate search results weekly and the EBI GWAS catalog quarterly.
@@ -21,7 +20,5 @@ We plan to update the local PubMed archive daily, the intermediate search result
 
 
 {% endblock %}
-
-
 
 
