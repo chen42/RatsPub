@@ -106,7 +106,7 @@ def login():
         found_user = users.query.filter_by(email=email).first()
         if (found_user and (bcrypt.checkpw(password.encode('utf8'), found_user.password))):
             session['email'] = found_user.email
-            print(bcrypt.hashpw(session['email'].encode('utf8'), bcrypt.gensalt()))
+            #print(bcrypt.hashpw(session['email'].encode('utf8'), bcrypt.gensalt()))
             session['hashed_email'] = hashlib.md5(session['email'] .encode('utf-8')).hexdigest()
             session['name'] = found_user.name
             session['id'] = found_user.id
@@ -229,7 +229,6 @@ def progress():
     if (search_type == []):
         search_type = ['GWAS', 'function', 'addiction', 'drug', 'brain', 'stress', 'psychiatric', 'cell']
     session['search_type'] = search_type
-    # only 1-100 terms are allowed
     genes=request.args.get('query')
     genes=genes.replace(",", " ")
     genes=genes.replace(";", " ")
@@ -243,10 +242,10 @@ def progress():
     genes2 = genes2_str.split()
     genes3 = genes1 + genes2
     genes = [re.sub("\s+", '-', s) for s in genes3]
-
-    #if len(genes)>=30:
-    #    message="<span class='text-danger'>Up to 30 terms can be searched at a time</span>"
-    #    return render_template('index.html', message=message)
+    # only 1-200 terms are allowed
+    if len(genes)>=200:
+        message="<span class='text-danger'>Up to 200 terms can be searched at a time</span>"
+        return render_template('index.html', message=message)
     if len(genes)==0:
         message="<span class='text-danger'>Please enter a search term </span>"
         return render_template('index.html', message=message)
@@ -358,9 +357,7 @@ def search():
             searchCnt=0
             nodesToHide=str()
             json_edges = str()
-
-            progress+=percent
-            
+            progress+=percent            
             genes_or = ' or '.join(genes)
             all_d=undic(addiction_d) +"|"+undic(drug_d)+"|"+undic(function_d)+"|"+undic(brain_d)+"|"+undic(stress_d)+"|"+undic(psychiatric_d)+"|"+undic(cell_d)
             #print(all_d)
@@ -920,7 +917,7 @@ def gene_gene():
                 sentword="sentence"
             else:
                 sentword="sentences"
-            print(sentword)
+            #print(sentword)
             topGeneHits[ "<li> <a href=/sentences?edgeID=" + url+ " target=_new>" + "Show " + str(hitGenes[key]) + " " + sentword +" </a> about "+query+" and <a href=/showTopGene?topGene="+key+" target=_gene><span style=\"background-color:#FcF3cf\">"+key+"</span></a>" ]=hitGenes[key]
         topSorted = [(k, topGeneHits[k]) for k in sorted(topGeneHits, key=topGeneHits.get, reverse=True)]
         for k,v in topSorted:
