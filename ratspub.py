@@ -23,7 +23,6 @@ def getabstracts(gene,query):
 sentences_ls=[]
 def getSentences(gene, sentences_ls):
     #abstracts = os.popen("esearch -db pubmed -query " +  query + " | efetch -format uid |fetch-pubmed -path "+ pubmed_path + " | xtract -pattern PubmedArticle -element MedlineCitation/PMID,ArticleTitle,AbstractText|sed \"s/-/ /g\"").read()
-    start = time.time()
     out=str()
 
     ## keep the sentence only if it contains the gene 
