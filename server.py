@@ -546,7 +546,7 @@ def tableview():
     gene_name = gene_name+added
     num_gene = gene_name.count(',')+1
 
-    message3="<b> Actions: </b><li> <font color=\"#E74C3C\">Click on the abstract count to read sentences linking the keyword and the gene</font>  <li> Click on a keyword to see the terms included in the search. <li>View the results in <a href='\\cytoscape/?rnd={}&genequery={}'\ ><b> a graph.</b></a>".format(rnd_url,genes_url)
+    message3="<ul><li> <font color=\"#E74C3C\">Click on the abstract count to read sentences linking the keyword and the gene</font>  <li> Click on a keyword to see the terms included in the search. <li>View the results in <a href='\\cytoscape/?rnd={}&genequery={}'\ ><b> a graph.</b></a> </ul> Links will be preserved when the table is copy-n-pasted into a spreadsheet.".format(rnd_url,genes_url)
     return render_template('tableview.html', genes_session_tmp = genes_session_tmp, nodata_temp=nodata_temp, num_gene=num_gene, jedges=jedges, jnodes=jnodes,gene_name=gene_name, message3=message3, rnd_url=rnd_url, genes_url=genes_url)
 
 @app.route("/tableview0/")
@@ -605,7 +605,7 @@ def tableview0():
     gene_name=gene_name.replace("'","")
     gene_name = gene_name+added
     num_gene = gene_name.count(',')+1
-    message4="<b> Notes: </b><li> These are the keywords that have <b>zero</b> abstract counts. <li>View all the results in <a href='\\cytoscape/?rnd={}&genequery={}'><b> a graph.</b></a>".format(rnd_url,genes_url)
+    message4="<b> Notes: </b><li> These are the keywords that have <b>zero</b> abstract counts. <li>View all the results in <a href='\\cytoscape/?rnd={}&genequery={}'><b> a graph.</b></a> ".format(rnd_url,genes_url)
     return render_template('tableview0.html',nodata_temp=nodata_temp, num_gene=num_gene, jedges=jedges, jnodes=jnodes,gene_name=gene_name, message4=message4)
 
 @app.route("/userarchive")
@@ -640,7 +640,7 @@ def userarchive():
         filename=filename[0:4]+"-"+filename[5:7]+"-"+filename[8:13]+":"+filename[14:16]+":"+filename[17:19]
         directory_list.append(filename)
     len_dir = len(directory_list)
-    message3="<b> Actions: </b><li> Click on the Date/Time to view archived results.  <li>The Date/Time are based on US Central time zone. "
+    message3="<ul><li> Click on the Date/Time to view archived results. <li>The Date/Time are based on US Central time zone.</ul> "
     return render_template('userarchive.html', len_dir=len_dir, gene_list = gene_list, folder_list=folder_list, directory_list=directory_list, session_id=session_id, message3=message3)
 
 # delete this search
@@ -674,7 +674,7 @@ def date():
         for line in file_edges.readlines():
             if ':' not in line:
                 nodata_temp = 1
-            else: 
+            else:
                 nodata_temp = 0
                 with open(tf_path+"/"+str(session['hashed_email'])+"/"+select_date+"/edges.json", "r") as edgesjsonfile:
                     jedges = json.load(edgesjsonfile)
@@ -709,7 +709,7 @@ def date():
     else:
         flash("You logged out!")
         return render_template('index.html')
-    message3="<b> Actions: </b><li> <font color=\"#E74C3C\">Click on the abstract count to read sentences linking the keyword and the gene</font> <li> Click on a keyword to see the terms included in the search. <li>View the results in <a href='\\cytoscape/?rnd={}&genequery={}'\ ><b> a graph.</b></a>".format(select_date,genes_session)
+    message3="<ul><li> <font color=\"#E74C3C\">Click on the abstract count to read sentences linking the keyword and the gene</font> <li> Click on a keyword to see the terms included in the search. <li>View the results in <a href='\\cytoscape/?rnd={}&genequery={}'\ ><b> a graph.</b></a> </ul> Links will be preserved when the table is copy-n-pasted into a spreadsheet.".format(select_date,genes_session)
     return render_template('tableview.html',nodata_temp=nodata_temp, num_gene=num_gene,genes_session_tmp = genes_session_tmp, rnd_url=select_date ,jedges=jedges, jnodes=jnodes,gene_name=gene_name, genes_url=genes_session, message3=message3)
 
 @app.route('/cytoscape/')
@@ -719,7 +719,7 @@ def cytoscape():
     tf_path=tempfile.gettempdir()
     genes_session_tmp=tf_path + "/" + genes_url
 
-    message2="<b> Actions: </b><li><font color=\"#E74C3C\">Click on a line to read the sentences </font> <li>Click on a keyword to see the terms included in the search<li>Hover a pointer over a node to hide other links <li>Move the nodes around to adjust visibility, reload the page to restore the default layout<li>View the results in <a href='\\tableview/?rnd={}&genequery={}'\ ><b>a table. </b></a>".format(rnd_url,genes_url)
+    message2="<ul><li><font color=\"#E74C3C\">Click on a line to read the sentences </font> <li>Click on a keyword to see the terms included in the search<li>Hover a pointer over a node to hide other links <li>Move the nodes around to adjust visibility <li> Reload the page to restore the default layout<li>View the results in <a href='\\tableview/?rnd={}&genequery={}'\ ><b>a table. </b></a></ul>".format(rnd_url,genes_url)
     if ('email' in session):
         filename = rnd_url.split("_0_")[0]
         rnd_url_tmp = datadir+"/user/"+str(session['hashed_email'])+"/"+rnd_url+"/"+filename
