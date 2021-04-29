@@ -1,3 +1,6 @@
+# RatsPub will be continued on as [GeneCup](https://github.com/hakangunturkun/GeneCup). No further udpate will be made here.
+
+
 # RatsPub: Relationship with Addiction Through Searches of PubMed
 
 URL: [http://rats.pub](http://rats.pub)
