@@ -16,7 +16,7 @@ Keras-Preprocessing==1.1.0
 Markdown==3.2.1
 #MarkupSafe==1.0
 nltk==3.4.5
-numpy==1.18.1
+numpy==1.22.0
 protobuf==3.11.3
 pycparser==2.19
 PyYAML==5.3
