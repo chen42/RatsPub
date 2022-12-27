@@ -22,7 +22,7 @@ pycparser==2.19
 PyYAML==5.3
 pytz==2020.4
 scipy==1.4.1
-setuptools==39.1.0
+setuptools==65.5.1
 six==1.14.0
 SQLAlchemy==1.3.12
 tensorboard==1.9.0
